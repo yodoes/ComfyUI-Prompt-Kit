@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "name_zh": "系统词库索引",
+  "name_en": "System Library Index",
+  "description": "插件自带示例词库列表。用户词库请放在 user_data/library/ 下。",
+  "libraries": []
+}

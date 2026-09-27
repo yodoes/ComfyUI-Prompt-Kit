@@ -1,0 +1,30 @@
+# 原始未整理大数据（体积大，不入库）
+原始未整理数据/
+
+# 用户数据目录（本地可读写，不随仓库分发）
+user_data/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# 编辑器 / 系统
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# 日志与临时
+*.log
+*.tmp
+*.bak
+.cache/

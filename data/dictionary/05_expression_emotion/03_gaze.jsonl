@@ -1,0 +1,46 @@
+{"text": "looking at viewer,", "text_zh": "看着观众，", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "excel:04_镜头.xlsx", "id": "05_03_gaze_00000_67f4c32c"}
+{"text": "looking at viewer", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00001_3369cfdc"}
+{"text": "- Face aligned toward viewer (eye contact)", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00002_9960957f"}
+{"text": "squinting", "text_zh": "眯起眼睛看", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "excel:07_表情.xlsx", "id": "05_03_gaze_00003_e26a97f9"}
+{"text": "disgust", "text_zh": "厌恶(看垃圾一样的眼神)", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "excel:07_表情.xlsx", "id": "05_03_gaze_00004_af702248"}
+{"text": "kubrick_stare", "text_zh": "侧头瞪着你", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "excel:07_表情.xlsx", "id": "05_03_gaze_00005_4a3577d9"}
+{"text": "blank_stare", "text_zh": "无主的眼神", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00006_9cb2b3ed"}
+{"text": "直视镜头 (Eye contact)", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00007_e4a2d6b4"}
+{"text": "looking away", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00008_5190b020"}
+{"text": "“DON’T STARE”", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00009_f3b5a9e1"}
+{"text": "stare_down", "text_zh": "凝视", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00010_7e7efe8e"}
+{"text": "bone_(stare)", "text_zh": "骨头（凝视）", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00011_5ab20c17"}
+{"text": "eye contact", "text_zh": "眼对眼（对视）", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00012_f0b10bb1"}
+{"text": "kubrick stare", "text_zh": "侧头瞪着你", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00013_df7b16c9"}
+{"text": "looking away from camera", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00017_b15978d5"}
+{"text": "a-stare", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00018_bdbde76e"}
+{"text": "astare", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00019_039da42b"}
+{"text": "bestare", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00020_36e75336"}
+{"text": "outstare", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00021_01dfaea5"}
+{"text": "outstared", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00022_fb97064f"}
+{"text": "outstares", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00023_d86986bb"}
+{"text": "pistareen", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00024_610a24ca"}
+{"text": "pistareens", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00025_0f46a4f0"}
+{"text": "shepstare", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00026_2105ae44"}
+{"text": "stare's", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00027_60134e95"}
+{"text": "stare-about", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00028_9cc230aa"}
+{"text": "stared", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00029_ac883081"}
+{"text": "staree", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00030_0c75c363"}
+{"text": "starer", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00031_a480868e"}
+{"text": "starer's", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00032_a62939a1"}
+{"text": "starers", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00033_393cfb01"}
+{"text": "stares", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00034_32ecdbfa"}
+{"text": "starets", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00035_7e0202ea"}
+{"text": "starets's", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00036_daeb3cdd"}
+{"text": "staretses", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00037_4b9d1ee6"}
+{"text": "staretz", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00038_322ea65c"}
+{"text": "staretzes", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00039_55683504"}
+{"text": "upstare", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00040_5e09359f"}
+{"text": "upstared", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00041_6cdbc265"}
+{"text": "upstares", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00042_b159c3d7"}
+{"text": "looking at another", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00043_35fa88e5"}
+{"text": "looking at mirror", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00044_2a5d5e27"}
+{"text": "looking at phone", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00045_178c4bd2"}
+{"text": "looking at self", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00046_97bf7c46"}
+{"text": "looking at crotch", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00047_197b1dcc"}
+{"text": "Stare Down", "text_zh": "", "category": "05_expression_emotion", "subcategory": "05_03_gaze", "tags": [], "nsfw": false, "source": "粗分去重版/字典库/SFW.jsonl", "id": "05_03_gaze_00048_4db18981"}

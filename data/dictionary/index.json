@@ -1,0 +1,576 @@
+{
+  "version": 1,
+  "name_zh": "字典分类树",
+  "name_en": "Dictionary Category Tree",
+  "description": "ComfyUI-Prompt-Kit 字典分类索引（v2）",
+  "categories": [
+    {
+      "id": "01_quality_technical",
+      "name_zh": "质量与技术",
+      "name_en": "Quality & Technical",
+      "order": 1,
+      "children": [
+        {
+          "id": "01_01_quality_detail",
+          "name_zh": "画质与细节",
+          "name_en": "Quality & Detail",
+          "file": "01_quality_technical/01_quality_detail.jsonl"
+        },
+        {
+          "id": "01_02_common_negatives",
+          "name_zh": "负面常用",
+          "name_en": "Common Negatives",
+          "file": "01_quality_technical/02_common_negatives.jsonl"
+        },
+        {
+          "id": "01_03_technical_descriptors",
+          "name_zh": "技术描述词",
+          "name_en": "Technical Descriptors",
+          "file": "01_quality_technical/03_technical_descriptors.jsonl"
+        }
+      ]
+    },
+    {
+      "id": "02_camera_composition",
+      "name_zh": "镜头与构图",
+      "name_en": "Camera & Composition",
+      "order": 2,
+      "children": [
+        {
+          "id": "02_01_shot_size",
+          "name_zh": "景别",
+          "name_en": "Shot Size",
+          "file": "02_camera_composition/01_shot_size.jsonl"
+        },
+        {
+          "id": "02_02_camera_angle",
+          "name_zh": "机位与视角",
+          "name_en": "Camera Angle",
+          "file": "02_camera_composition/02_camera_angle.jsonl"
+        },
+        {
+          "id": "02_03_lens_focal",
+          "name_zh": "焦段与镜头效果",
+          "name_en": "Lens & Focal Length",
+          "file": "02_camera_composition/03_lens_focal.jsonl"
+        },
+        {
+          "id": "02_04_composition",
+          "name_zh": "构图与布局",
+          "name_en": "Composition",
+          "file": "02_camera_composition/04_composition.jsonl"
+        },
+        {
+          "id": "02_05_depth_focus",
+          "name_zh": "景深与对焦",
+          "name_en": "Depth of Field & Focus",
+          "file": "02_camera_composition/05_depth_focus.jsonl"
+        },
+        {
+          "id": "02_06_aspect_ratio",
+          "name_zh": "画幅与比例",
+          "name_en": "Aspect Ratio",
+          "file": "02_camera_composition/06_aspect_ratio.jsonl"
+        }
+      ]
+    },
+    {
+      "id": "03_subject_character",
+      "name_zh": "人物主体",
+      "name_en": "Subject / Character",
+      "order": 3,
+      "children": [
+        {
+          "id": "03_01_basic_attributes",
+          "name_zh": "基础属性",
+          "name_en": "Basic Attributes",
+          "file": "03_subject_character/01_basic_attributes.jsonl"
+        },
+        {
+          "id": "03_02_body_build",
+          "name_zh": "体型与身材",
+          "name_en": "Body Build & Figure",
+          "file": "03_subject_character/02_body_build.jsonl"
+        },
+        {
+          "id": "03_03_face_features",
+          "name_zh": "面部与五官",
+          "name_en": "Face & Features",
+          "file": "03_subject_character/03_face_features.jsonl"
+        },
+        {
+          "id": "03_04_hair",
+          "name_zh": "发型与毛发",
+          "name_en": "Hair",
+          "file": "03_subject_character/04_hair.jsonl"
+        },
+        {
+          "id": "03_05_makeup",
+          "name_zh": "妆容",
+          "name_en": "Makeup",
+          "file": "03_subject_character/05_makeup.jsonl"
+        },
+        {
+          "id": "03_06_identity_role",
+          "name_zh": "身份 / 职业 / 设定",
+          "name_en": "Identity / Role",
+          "file": "03_subject_character/06_identity_role.jsonl"
+        }
+      ]
+    },
+    {
+      "id": "04_body_parts",
+      "name_zh": "身体部位特写",
+      "name_en": "Body Parts Close-up",
+      "order": 4,
+      "children": [
+        {
+          "id": "04_01_skin",
+          "name_zh": "皮肤",
+          "name_en": "Skin",
+          "file": "04_body_parts/01_skin.jsonl"
+        },
+        {
+          "id": "04_02_hands",
+          "name_zh": "手部",
+          "name_en": "Hands",
+          "file": "04_body_parts/02_hands.jsonl"
+        },
+        {
+          "id": "04_03_arms_shoulders",
+          "name_zh": "手臂与肩部",
+          "name_en": "Arms & Shoulders",
+          "file": "04_body_parts/03_arms_shoulders.jsonl"
+        },
+        {
+          "id": "04_04_chest",
+          "name_zh": "胸部",
+          "name_en": "Chest / Bust",
+          "file": "04_body_parts/04_chest.jsonl"
+        },
+        {
+          "id": "04_05_waist_back",
+          "name_zh": "腰腹与背部",
+          "name_en": "Waist / Back",
+          "file": "04_body_parts/05_waist_back.jsonl"
+        },
+        {
+          "id": "04_06_hips",
+          "name_zh": "臀部",
+          "name_en": "Hips / Butt",
+          "file": "04_body_parts/06_hips.jsonl"
+        },
+        {
+          "id": "04_07_legs",
+          "name_zh": "腿部",
+          "name_en": "Legs",
+          "file": "04_body_parts/07_legs.jsonl"
+        },
+        {
+          "id": "04_08_feet",
+          "name_zh": "脚与脚趾",
+          "name_en": "Feet & Toes",
+          "file": "04_body_parts/08_feet.jsonl"
+        },
+        {
+          "id": "04_09_other_body",
+          "name_zh": "其他身体细节",
+          "name_en": "Other Body Details",
+          "file": "04_body_parts/09_other_body.jsonl"
+        }
+      ]
+    },
+    {
+      "id": "05_expression_emotion",
+      "name_zh": "表情与情绪",
+      "name_en": "Expression & Emotion",
+      "order": 5,
+      "children": [
+        {
+          "id": "05_01_basic_expressions",
+          "name_zh": "基础表情",
+          "name_en": "Basic Expressions",
+          "file": "05_expression_emotion/01_basic_expressions.jsonl"
+        },
+        {
+          "id": "05_02_intense_emotions",
+          "name_zh": "强烈情绪",
+          "name_en": "Intense Emotions",
+          "file": "05_expression_emotion/02_intense_emotions.jsonl"
+        },
+        {
+          "id": "05_03_gaze",
+          "name_zh": "眼神与视线",
+          "name_en": "Gaze & Eyes Expression",
+          "file": "05_expression_emotion/03_gaze.jsonl"
+        },
+        {
+          "id": "05_04_mouth_micro",
+          "name_zh": "口型与微表情",
+          "name_en": "Mouth & Micro-expressions",
+          "file": "05_expression_emotion/04_mouth_micro.jsonl"
+        }
+      ]
+    },
+    {
+      "id": "06_pose_action",
+      "name_zh": "动作与姿态",
+      "name_en": "Pose & Action",
+      "order": 6,
+      "children": [
+        {
+          "id": "06_01_base_pose",
+          "name_zh": "基础姿态",
+          "name_en": "Base Pose",
+          "file": "06_pose_action/01_base_pose.jsonl"
+        },
+        {
+          "id": "06_02_body_direction",
+          "name_zh": "身体方向与重心",
+          "name_en": "Body Direction & Weight",
+          "file": "06_pose_action/02_body_direction.jsonl"
+        },
+        {
+          "id": "06_03_hand_actions",
+          "name_zh": "手部动作",
+          "name_en": "Hand Actions",
+          "file": "06_pose_action/03_hand_actions.jsonl"
+        },
+        {
+          "id": "06_04_leg_actions",
+          "name_zh": "腿部与脚步",
+          "name_en": "Leg & Foot Actions",
+          "file": "06_pose_action/04_leg_actions.jsonl"
+        },
+        {
+          "id": "06_05_dynamic_actions",
+          "name_zh": "动态动作",
+          "name_en": "Dynamic Actions",
+          "file": "06_pose_action/05_dynamic_actions.jsonl"
+        },
+        {
+          "id": "06_06_interactive_actions",
+          "name_zh": "互动动作",
+          "name_en": "Interactive Actions",
+          "file": "06_pose_action/06_interactive_actions.jsonl"
+        },
+        {
+          "id": "06_07_head_neck",
+          "name_zh": "头部与肩颈",
+          "name_en": "Head & Neck",
+          "file": "06_pose_action/07_head_neck.jsonl"
+        }
+      ]
+    },
+    {
+      "id": "07_clothing_outfit",
+      "name_zh": "服饰与穿搭",
+      "name_en": "Clothing & Outfit",
+      "order": 7,
+      "children": [
+        {
+          "id": "07_01_tops",
+          "name_zh": "上衣",
+          "name_en": "Tops",
+          "file": "07_clothing_outfit/01_tops.jsonl"
+        },
+        {
+          "id": "07_02_bottoms",
+          "name_zh": "下装",
+          "name_en": "Bottoms",
+          "file": "07_clothing_outfit/02_bottoms.jsonl"
+        },
+        {
+          "id": "07_03_dresses_sets",
+          "name_zh": "连体 / 连衣裙 / 套装",
+          "name_en": "Dresses & Sets",
+          "file": "07_clothing_outfit/03_dresses_sets.jsonl"
+        },
+        {
+          "id": "07_04_outerwear",
+          "name_zh": "外套与罩衫",
+          "name_en": "Outerwear",
+          "file": "07_clothing_outfit/04_outerwear.jsonl"
+        },
+        {
+          "id": "07_05_footwear",
+          "name_zh": "鞋靴",
+          "name_en": "Footwear",
+          "file": "07_clothing_outfit/05_footwear.jsonl"
+        },
+        {
+          "id": "07_06_clothing_style",
+          "name_zh": "服饰风格",
+          "name_en": "Clothing Style",
+          "file": "07_clothing_outfit/06_clothing_style.jsonl"
+        },
+        {
+          "id": "07_07_materials",
+          "name_zh": "材质与面料",
+          "name_en": "Materials & Fabrics",
+          "file": "07_clothing_outfit/07_materials.jsonl"
+        },
+        {
+          "id": "07_08_details_condition",
+          "name_zh": "服饰细节与状态",
+          "name_en": "Details & Condition",
+          "file": "07_clothing_outfit/08_details_condition.jsonl"
+        },
+        {
+          "id": "07_09_colors_patterns",
+          "name_zh": "配色与图案",
+          "name_en": "Colors & Patterns",
+          "file": "07_clothing_outfit/09_colors_patterns.jsonl"
+        }
+      ]
+    },
+    {
+      "id": "08_accessories_props",
+      "name_zh": "配饰与道具",
+      "name_en": "Accessories & Props",
+      "order": 8,
+      "children": [
+        {
+          "id": "08_01_headwear",
+          "name_zh": "头饰",
+          "name_en": "Headwear & Hair Accessories",
+          "file": "08_accessories_props/01_headwear.jsonl"
+        },
+        {
+          "id": "08_02_jewelry",
+          "name_zh": "颈饰 / 耳饰 / 首饰",
+          "name_en": "Jewelry",
+          "file": "08_accessories_props/02_jewelry.jsonl"
+        },
+        {
+          "id": "08_03_hand_accessories",
+          "name_zh": "手部饰品",
+          "name_en": "Hand Accessories",
+          "file": "08_accessories_props/03_hand_accessories.jsonl"
+        },
+        {
+          "id": "08_04_personal_items",
+          "name_zh": "随身物品",
+          "name_en": "Personal Items",
+          "file": "08_accessories_props/04_personal_items.jsonl"
+        },
+        {
+          "id": "08_05_weapons_gear",
+          "name_zh": "武器与装备",
+          "name_en": "Weapons & Gear",
+          "file": "08_accessories_props/05_weapons_gear.jsonl"
+        },
+        {
+          "id": "08_06_other_props",
+          "name_zh": "其他道具",
+          "name_en": "Other Props",
+          "file": "08_accessories_props/06_other_props.jsonl"
+        }
+      ]
+    },
+    {
+      "id": "09_scene_environment",
+      "name_zh": "场景与环境",
+      "name_en": "Scene & Environment",
+      "order": 9,
+      "children": [
+        {
+          "id": "09_01_indoor",
+          "name_zh": "室内场景",
+          "name_en": "Indoor",
+          "file": "09_scene_environment/01_indoor.jsonl"
+        },
+        {
+          "id": "09_02_outdoor",
+          "name_zh": "室外场景",
+          "name_en": "Outdoor",
+          "file": "09_scene_environment/02_outdoor.jsonl"
+        },
+        {
+          "id": "09_03_nature",
+          "name_zh": "自然元素",
+          "name_en": "Nature Elements",
+          "file": "09_scene_environment/03_nature.jsonl"
+        },
+        {
+          "id": "09_04_architecture",
+          "name_zh": "建筑与空间",
+          "name_en": "Architecture & Space",
+          "file": "09_scene_environment/04_architecture.jsonl"
+        },
+        {
+          "id": "09_05_time_weather",
+          "name_zh": "时间与天气",
+          "name_en": "Time & Weather",
+          "file": "09_scene_environment/05_time_weather.jsonl"
+        },
+        {
+          "id": "09_06_spatial_layers",
+          "name_zh": "前景 / 背景 / 空间层次",
+          "name_en": "Foreground / Background / Depth",
+          "file": "09_scene_environment/06_spatial_layers.jsonl"
+        },
+        {
+          "id": "09_07_atmosphere",
+          "name_zh": "氛围与情境",
+          "name_en": "Atmosphere & Mood",
+          "file": "09_scene_environment/07_atmosphere.jsonl"
+        }
+      ]
+    },
+    {
+      "id": "10_lighting_effects",
+      "name_zh": "光影与视觉效果",
+      "name_en": "Lighting & Visual Effects",
+      "order": 10,
+      "children": [
+        {
+          "id": "10_01_light_source",
+          "name_zh": "光线类型与方向",
+          "name_en": "Light Source & Direction",
+          "file": "10_lighting_effects/01_light_source.jsonl"
+        },
+        {
+          "id": "10_02_light_quality",
+          "name_zh": "光线质地",
+          "name_en": "Light Quality",
+          "file": "10_lighting_effects/02_light_quality.jsonl"
+        },
+        {
+          "id": "10_03_shadow_contrast",
+          "name_zh": "阴影与对比",
+          "name_en": "Shadow & Contrast",
+          "file": "10_lighting_effects/03_shadow_contrast.jsonl"
+        },
+        {
+          "id": "10_04_special_lighting",
+          "name_zh": "特殊光效",
+          "name_en": "Special Lighting Effects",
+          "file": "10_lighting_effects/04_special_lighting.jsonl"
+        },
+        {
+          "id": "10_05_particles_fx",
+          "name_zh": "粒子 / 烟雾 / 发光等",
+          "name_en": "Particles / FX",
+          "file": "10_lighting_effects/05_particles_fx.jsonl"
+        }
+      ]
+    },
+    {
+      "id": "11_style_medium",
+      "name_zh": "风格与媒介",
+      "name_en": "Style & Medium",
+      "order": 11,
+      "children": [
+        {
+          "id": "11_01_overall_style",
+          "name_zh": "总体画风",
+          "name_en": "Overall Style",
+          "file": "11_style_medium/01_overall_style.jsonl"
+        },
+        {
+          "id": "11_02_art_medium",
+          "name_zh": "艺术媒介",
+          "name_en": "Art Medium",
+          "file": "11_style_medium/02_art_medium.jsonl"
+        },
+        {
+          "id": "11_03_texture_finish",
+          "name_zh": "画面质感",
+          "name_en": "Texture & Finish",
+          "file": "11_style_medium/03_texture_finish.jsonl"
+        },
+        {
+          "id": "11_04_specific_style_tags",
+          "name_zh": "特定风格标签",
+          "name_en": "Specific Style Tags",
+          "file": "11_style_medium/04_specific_style_tags.jsonl"
+        }
+      ]
+    },
+    {
+      "id": "12_artist_ip",
+      "name_zh": "绘师与 IP",
+      "name_en": "Artist & IP",
+      "order": 12,
+      "children": [
+        {
+          "id": "12_01_artist_style",
+          "name_zh": "绘师风格",
+          "name_en": "Artist Style",
+          "file": "12_artist_ip/01_artist_style.jsonl"
+        },
+        {
+          "id": "12_02_ip_series",
+          "name_zh": "知名 IP / 作品风格",
+          "name_en": "IP / Series Style",
+          "file": "12_artist_ip/02_ip_series.jsonl"
+        },
+        {
+          "id": "12_03_character_related",
+          "name_zh": "角色相关（谨慎使用）",
+          "name_en": "Character Related",
+          "file": "12_artist_ip/03_character_related.jsonl"
+        }
+      ]
+    },
+    {
+      "id": "13_color_palette",
+      "name_zh": "色彩与调色",
+      "name_en": "Color & Palette",
+      "order": 13,
+      "children": [
+        {
+          "id": "13_01_main_tone",
+          "name_zh": "主色调",
+          "name_en": "Main Color Tone",
+          "file": "13_color_palette/01_main_tone.jsonl"
+        },
+        {
+          "id": "13_02_color_scheme",
+          "name_zh": "配色方案",
+          "name_en": "Color Scheme",
+          "file": "13_color_palette/02_color_scheme.jsonl"
+        },
+        {
+          "id": "13_03_color_mood",
+          "name_zh": "色彩情绪",
+          "name_en": "Color Mood",
+          "file": "13_color_palette/03_color_mood.jsonl"
+        },
+        {
+          "id": "13_04_special_color",
+          "name_zh": "特殊色彩效果",
+          "name_en": "Special Color Effects",
+          "file": "13_color_palette/04_special_color.jsonl"
+        }
+      ]
+    },
+    {
+      "id": "14_misc_custom",
+      "name_zh": "其他 / 自定义",
+      "name_en": "Misc / Custom",
+      "order": 14,
+      "children": [
+        {
+          "id": "14_01_text_symbols",
+          "name_zh": "文字与符号",
+          "name_en": "Text & Symbols",
+          "file": "14_misc_custom/01_text_symbols.jsonl"
+        },
+        {
+          "id": "14_02_meta_structure",
+          "name_zh": "元提示词 / 结构词",
+          "name_en": "Meta / Structure",
+          "file": "14_misc_custom/02_meta_structure.jsonl"
+        },
+        {
+          "id": "14_03_user_staging",
+          "name_zh": "用户暂存 / 待分类",
+          "name_en": "User Staging",
+          "file": "14_misc_custom/03_user_staging.jsonl"
+        }
+      ]
+    }
+  ]
+}

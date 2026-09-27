@@ -1,0 +1,18 @@
+"""
+字典管理域节点。
+实现：分类浏览、搜索、收藏、用户添加词条。
+"""
+from __future__ import annotations
+
+from .browser import (
+    NODE_CLASS_MAPPINGS as _BROWSER_MAPPINGS,
+    NODE_DISPLAY_NAME_MAPPINGS as _BROWSER_DISPLAY,
+)
+
+NODE_CLASS_MAPPINGS = {}
+NODE_CLASS_MAPPINGS.update(_BROWSER_MAPPINGS)
+
+NODE_DISPLAY_NAME_MAPPINGS = {}
+NODE_DISPLAY_NAME_MAPPINGS.update(_BROWSER_DISPLAY)
+
+__all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS"]

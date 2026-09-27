@@ -1,0 +1,34 @@
+"""
+节点包入口：按大功能域汇总注册。
+
+域划分：
+  - dictionary  字典管理
+  - library     词库 / 预设管理
+  - builder     结构化生成
+"""
+from __future__ import annotations
+
+from .dictionary import (
+    NODE_CLASS_MAPPINGS as _DICT_MAPPINGS,
+    NODE_DISPLAY_NAME_MAPPINGS as _DICT_DISPLAY,
+)
+from .library import (
+    NODE_CLASS_MAPPINGS as _LIB_MAPPINGS,
+    NODE_DISPLAY_NAME_MAPPINGS as _LIB_DISPLAY,
+)
+from .builder import (
+    NODE_CLASS_MAPPINGS as _BUILDER_MAPPINGS,
+    NODE_DISPLAY_NAME_MAPPINGS as _BUILDER_DISPLAY,
+)
+
+NODE_CLASS_MAPPINGS = {}
+NODE_CLASS_MAPPINGS.update(_DICT_MAPPINGS)
+NODE_CLASS_MAPPINGS.update(_LIB_MAPPINGS)
+NODE_CLASS_MAPPINGS.update(_BUILDER_MAPPINGS)
+
+NODE_DISPLAY_NAME_MAPPINGS = {}
+NODE_DISPLAY_NAME_MAPPINGS.update(_DICT_DISPLAY)
+NODE_DISPLAY_NAME_MAPPINGS.update(_LIB_DISPLAY)
+NODE_DISPLAY_NAME_MAPPINGS.update(_BUILDER_DISPLAY)
+
+__all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS"]

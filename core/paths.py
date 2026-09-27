@@ -1,0 +1,38 @@
+"""
+路径管理：统一插件根目录、内置数据目录、用户数据目录。
+"""
+from __future__ import annotations
+
+import os
+from pathlib import Path
+
+
+class Paths:
+    """插件内所有路径的单一入口。"""
+
+    def __init__(self) -> None:
+        # 插件根目录（本文件位于 core/ 下，上两级为包根）
+        self.root: Path = Path(__file__).resolve().parent.parent
+        self.data: Path = self.root / "data"
+        self.dictionary: Path = self.data / "dictionary"
+        self.library: Path = self.data / "library"
+        self.user_data: Path = self.root / "user_data"
+        self.user_dictionary: Path = self.user_data / "dictionary"
+        self.user_library: Path = self.user_data / "library"
+        self.settings_file: Path = self.user_data / "settings.json"
+        self.favorites_file: Path = self.user_data / "favorites.json"
+        self.dictionary_index: Path = self.dictionary / "index.json"
+        self.web: Path = self.root / "web"
+
+    def ensure_user_dirs(self) -> None:
+        """确保用户数据目录存在（首次运行或被删除时自动创建）。"""
+        self.user_dictionary.mkdir(parents=True, exist_ok=True)
+        self.user_library.mkdir(parents=True, exist_ok=True)
+
+    def resolve(self, *parts: str) -> Path:
+        """相对插件根目录解析路径。"""
+        return self.root.joinpath(*parts)
+
+
+# 模块级单例，方便各处直接 import
+paths = Paths()
