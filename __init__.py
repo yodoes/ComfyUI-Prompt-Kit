@@ -16,6 +16,12 @@ settings.load()
 
 from .nodes import NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS
 
+# 注册 HTTP API（ComfyUI 环境下）
+try:
+    from .core import api_routes  # noqa: F401
+except Exception as e:
+    print(f"[Prompt-Kit] API routes not loaded: {e}")
+
 WEB_DIRECTORY = "./web"
 
 __all__ = [
