@@ -3,6 +3,7 @@
 
 # 用户数据目录（本地可读写，不随仓库分发）
 user_data/
+docs/
 
 # Python
 __pycache__/
