@@ -1,8 +1,10 @@
 # 原始未整理大数据（体积大，不入库）
 原始未整理数据/
+data/dictionary_nsfw/
 
 # 用户数据目录（本地可读写，不随仓库分发）
 user_data/
+docs/
 
 # Python
 __pycache__/
@@ -22,9 +24,14 @@ build/
 *.swo
 .DS_Store
 Thumbs.db
+.workbuddy/
 
 # 日志与临时
 *.log
 *.tmp
 *.bak
 .cache/
+
+# 翻译流水线临时产物（清单 / 译文 / 备份，体积大且可重生成）
+tools/translate/_work/
+tools/
