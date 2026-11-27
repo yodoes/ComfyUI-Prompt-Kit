@@ -1,0 +1,2 @@
+# 统一换行，避免 core.autocrlf 造成整文件「幻影 diff」
+* text=auto eol=lf

@@ -2,6 +2,12 @@
 原始未整理数据/
 data/dictionary_nsfw/
 
+# 字典暂存桶（68.6 万条 / 146MB，本地保留，不入库）
+data/dictionary/14_misc_custom/03_user_staging.jsonl
+
+# 结构化 NSFW 词表（与 dictionary_nsfw 口径一致，本地保留，不入库）
+data/builder_nsfw/
+
 # 用户数据目录（本地可读写，不随仓库分发）
 user_data/
 docs/
