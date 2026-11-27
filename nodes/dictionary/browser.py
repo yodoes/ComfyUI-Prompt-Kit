@@ -1,19 +1,13 @@
 """
-字典节点（阶段 2 打磨版）
-
-日常只需两个节点：
-  1. PromptKit · 字典选词   — 搜索 / 分类浏览 / 收藏，一键取词
-  2. PromptKit · 字典管理   — 添加词条、收藏、取消收藏
-
-设计原则：
-  - 不要求用户手填 entry_id 或行号
-  - 大类 13 项下拉（不用 73 中类长列表）
-  - 中类用「名称包含」过滤，可选
-  - 取用方式明确：全部(限N) / 第一条 / 随机N条
+字典节点
+  1. PromptKit · 字典选词
+  2. PromptKit · 字典面板
+  3. PromptKit · 新增字典词条
 """
 from __future__ import annotations
 
 import random
+import time
 from typing import Any, Dict, List, Optional, Tuple
 
 try:
@@ -24,9 +18,16 @@ except ImportError:
     from core.settings import settings
 
 
-# ---------------------------------------------------------------------------
-# helpers
-# ---------------------------------------------------------------------------
+
+def _effective_seed(seed: int) -> int:
+    """seed==0 时每次变化；非 0 可复现。"""
+    s = int(seed) & 0xFFFFFFFF
+    if s == 0:
+        s = (time.time_ns() ^ id(object())) & 0xFFFFFFFF
+        if s == 0:
+            s = 1
+    return s
+
 
 def _join(texts: List[str]) -> str:
     sep = settings.get("separator", ", ") or ", "
@@ -42,31 +43,33 @@ def _join(texts: List[str]) -> str:
 
 
 def _parse_cat_id(label: str) -> Optional[str]:
-    """从 '01_xxx|中文名' 或 '全部' 解析大类 id。"""
+    """从中文名、id、或旧格式 id|中文名 解析大类 id。"""
     label = (label or "").strip()
     if not label or label == "全部":
         return None
-    return label.split("|")[0].strip()
+    if "|" in label:
+        return label.split("|")[0].strip()
+    tree = dictionary_service.get_category_tree(include_misc=True, include_nsfw=True)
+    for c in tree:
+        if c.get("id") == label or (c.get("name") or "").strip() == label:
+            return c.get("id")
+    return label
 
 
-def _cat_choices(include_misc: bool = False) -> List[str]:
-    tree = dictionary_service.get_category_tree(include_misc=include_misc)
-    return ["全部"] + [f"{c['id']}|{c['name']}" for c in tree]
+def _cat_choices(include_misc: bool = False, include_nsfw: bool = False) -> List[str]:
+    tree = dictionary_service.get_category_tree(include_misc=include_misc, include_nsfw=include_nsfw)
+    return ["全部"] + [(c.get("name") or c.get("id") or "") for c in tree]
 
 
 def _resolve_sub_ids(
     category_label: str,
     subcategory_filter: str,
     include_misc: bool,
+    include_nsfw: bool = False,
 ) -> Optional[List[str]]:
-    """
-    根据大类 + 中类名称过滤，得到要扫描的 subcategory id 列表。
-    返回 None 表示「全部正式分类」。
-    """
-    tree = dictionary_service.get_category_tree(include_misc=include_misc)
+    tree = dictionary_service.get_category_tree(include_misc=include_misc, include_nsfw=include_nsfw)
     cid = _parse_cat_id(category_label)
     kw = (subcategory_filter or "").strip().lower()
-
     candidates = []
     for c in tree:
         if cid and c["id"] != cid:
@@ -89,397 +92,188 @@ def _collect_entries(
     subcategory_filter: str,
     include_misc: bool,
     limit_scan: int,
+    include_nsfw: bool = False,
 ) -> List[Dict[str, Any]]:
-    """按模式收集候选词条（尚未做最终取用裁剪）。"""
     mode = (mode or "搜索").strip()
     query = (query or "").strip()
 
     if mode == "收藏":
         fav_ids = dictionary_service.list_favorites()
-        entries: List[Dict[str, Any]] = []
+        rows = []
         for eid in fav_ids:
-            e = dictionary_service.get_entry_by_id(eid, include_misc=True)
-            if not e:
-                continue
-            if query:
-                blob = f"{e.get('text','')} {e.get('text_zh','')} {e.get('id','')}".lower()
-                if query.lower() not in blob:
-                    continue
-            entries.append(e)
-            if len(entries) >= limit_scan:
+            e = dictionary_service.get_entry_by_id(eid, include_misc=True, include_nsfw=True)
+            if e:
+                if query:
+                    blob = " ".join(
+                        [
+                            str(e.get("text_zh") or ""),
+                            str(e.get("text") or ""),
+                            " ".join(e.get("tags") or []),
+                        ]
+                    ).lower()
+                    if query.lower() not in blob:
+                        continue
+                rows.append(e)
+            if len(rows) >= limit_scan:
                 break
-        return entries
+        return rows
 
-    sub_ids = _resolve_sub_ids(category, subcategory_filter, include_misc)
-
+    sub_ids = _resolve_sub_ids(category, subcategory_filter, include_misc, include_nsfw)
     if mode == "搜索":
         if not query and not subcategory_filter and _parse_cat_id(category) is None:
-            # 无任何条件时不扫全库，避免卡顿
             return []
         return dictionary_service.search(
-            query or "",  # 空 query 时仍可用 tags/范围；服务层空 query + 无 tags 会返回 []
+            query or "",
             subcategory_ids=sub_ids,
             include_misc=include_misc,
+            include_nsfw=include_nsfw,
             language="both",
             limit=limit_scan,
         )
 
-    # 分类浏览：加载范围内全部，再按 query 本地过滤
+    # 分类浏览
     if sub_ids is None:
-        sub_ids = dictionary_service.list_subcategory_ids(include_misc=include_misc)
-
-    entries = []
-    q = query.lower()
+        sub_ids = dictionary_service.list_subcategory_ids(
+            include_misc=include_misc, include_nsfw=include_nsfw
+        )
+    rows: List[Dict[str, Any]] = []
     for sid in sub_ids:
         for e in dictionary_service.load_subcategory(sid):
-            if q:
-                blob = f"{e.get('text','')} {e.get('text_zh','')}".lower()
-                if q not in blob:
+            if query:
+                blob = " ".join(
+                    [
+                        str(e.get("text_zh") or ""),
+                        str(e.get("text") or ""),
+                        " ".join(e.get("tags") or []),
+                    ]
+                ).lower()
+                if query.lower() not in blob:
                     continue
-            entries.append(e)
-            if len(entries) >= limit_scan:
-                return entries
-    return entries
+            rows.append(e)
+            if len(rows) >= limit_scan:
+                return rows
+    return rows
 
 
-def _pick(
-    entries: List[Dict[str, Any]],
-    pick_mode: str,
-    n: int,
-    seed: int,
-) -> List[Dict[str, Any]]:
-    if not entries:
-        return []
-    pick_mode = (pick_mode or "前N条").strip()
-    n = max(1, min(int(n), 200))
+def _display(e: Dict[str, Any], language: str) -> str:
+    return dictionary_service.display_text(e, language)
 
-    if pick_mode == "仅第1条":
-        return entries[:1]
-    if pick_mode == "随机N条":
-        rng = random.Random(seed)
-        k = min(n, len(entries))
-        return rng.sample(entries, k)
-    # 前N条
-    return entries[:n]
-
-
-def _preview(entries: List[Dict[str, Any]], language: str, max_lines: int = 40) -> str:
-    lines = []
-    for i, e in enumerate(entries[:max_lines]):
-        d = dictionary_service.display_text(e, language)
-        src = e.get("subcategory") or e.get("category") or ""
-        lines.append(f"{i+1}. {d}  · {src}")
-    if len(entries) > max_lines:
-        lines.append(f"… 共 {len(entries)} 条，仅预览前 {max_lines} 条")
-    return "\n".join(lines)
-
-
-# ---------------------------------------------------------------------------
-# 节点 1：字典选词（日常主节点）
-# ---------------------------------------------------------------------------
 
 class PromptKitDictionaryPick:
-    """
-    一站式选词：搜索 / 按大类浏览 / 从收藏取词。
-    不需要手填 id 或行号。
-    """
-
     @classmethod
     def INPUT_TYPES(cls) -> Dict[str, Any]:
         return {
             "required": {
-                "mode": (["搜索", "分类浏览", "收藏"], {"default": "搜索"}),
-                "query": (
+                "模式": (["搜索", "分类浏览", "收藏"], {"default": "搜索", "tooltip": "选词模式"}),
+                "关键词": (
                     "STRING",
-                    {
-                        "default": "",
-                        "multiline": False,
-                        "tooltip": "搜索关键词；分类浏览时作二次过滤；收藏时过滤收藏夹",
-                    },
+                    {"default": "", "multiline": False, "tooltip": "搜索关键词；分类浏览时可作二次过滤"},
                 ),
-                "category": (_cat_choices(False), {"default": "全部"}),
-                "subcategory_filter": (
+                "大类": (_cat_choices(False), {"default": "全部", "tooltip": "字典大类（仅中文名）"}),
+                "中类过滤": (
                     "STRING",
-                    {
-                        "default": "",
-                        "multiline": False,
-                        "tooltip": "中类名称包含（如：景别、表情、连衣裙）。可空",
-                    },
+                    {"default": "", "multiline": False, "tooltip": "中类名称包含（如：景别、表情）。可空"},
                 ),
-                "pick": (["前N条", "仅第1条", "随机N条"], {"default": "前N条"}),
-                "n": ("INT", {"default": 8, "min": 1, "max": 100}),
-                "language": (["zh", "en", "both"], {"default": "zh"}),
+                "取用方式": (["前N条", "仅第1条", "随机N条"], {"default": "前N条", "tooltip": "从结果中取用规则"}),
+                "数量": ("INT", {"default": 8, "min": 1, "max": 100, "tooltip": "取用条数"}),
+                "语言": (["zh", "en", "both"], {"default": "zh", "tooltip": "输出语言"}),
             },
             "optional": {
-                "panel_text": (
+                "面板文本": (
                     "STRING",
-                    {
-                        "default": "",
-                        "multiline": True,
-                        "tooltip": "由「打开字典面板」写入；非空时优先作为输出 text",
-                    },
+                    {"default": "", "multiline": True, "tooltip": "由字典面板写入；非空时优先作为输出"},
                 ),
-                "seed": ("INT", {"default": 0, "min": 0, "max": 0xFFFFFFFF}),
-                "include_misc": ("BOOLEAN", {"default": False}),
-                "scan_limit": ("INT", {"default": 300, "min": 20, "max": 2000}),
+                "随机种子": ("INT", {"default": 0, "min": 0, "max": 0xFFFFFFFF, "control_after_generate": True, "tooltip": "随机取用种子；0=每次自动变化；非0可复现"}),
+                "含素材池": ("BOOLEAN", {"default": False, "tooltip": "是否包含「素材池」大类"}),
+                "含NSFW": ("BOOLEAN", {"default": False, "tooltip": "是否包含 NSFW 分类"}),
+                "扫描上限": ("INT", {"default": 300, "min": 20, "max": 2000, "tooltip": "最多扫描条数"}),
             },
         }
 
     RETURN_TYPES = ("STRING", "STRING", "INT")
-    RETURN_NAMES = ("text", "preview", "hit_count")
+    RETURN_NAMES = ("文本", "预览", "命中数")
     FUNCTION = "run"
     CATEGORY = "PromptKit/字典/选词"
-    SEARCH_ALIASES = ["pk", "PK", "promptkit", "字典", "选词", "字典选词"]
-    DESCRIPTION = "字典选词：搜索 / 分类浏览 / 收藏。输出可直接接入提示词。节点上可点「打开字典面板」。"
+    SEARCH_ALIASES = ["pk", "promptkit", "字典", "选词", "字典选词"]
+    DESCRIPTION = "字典选词：搜索 / 分类浏览 / 收藏。可打开字典面板点选。"
 
     def run(
         self,
-        mode: str,
-        query: str,
-        category: str,
-        subcategory_filter: str,
-        pick: str,
-        n: int,
-        language: str,
-        panel_text: str = "",
-        seed: int = 0,
-        include_misc: bool = False,
-        scan_limit: int = 300,
+        **kwargs,
     ) -> Tuple[str, str, int]:
-        # 面板写入优先
-        panel_text = (panel_text or "").strip()
-        if panel_text:
-            lines = [ln.strip() for ln in panel_text.replace(",", "\n").splitlines() if ln.strip()]
-            preview = "\n".join(f"{i+1}. {t}" for i, t in enumerate(lines[:40]))
-            return (panel_text, preview or panel_text, len(lines) or 1)
+        mode = kwargs.get("模式") or kwargs.get("mode") or "搜索"
+        query = kwargs.get("关键词") if "关键词" in kwargs else kwargs.get("query", "")
+        category = kwargs.get("大类") if "大类" in kwargs else kwargs.get("category", "全部")
+        subcategory_filter = kwargs.get("中类过滤") if "中类过滤" in kwargs else kwargs.get("subcategory_filter", "")
+        pick = kwargs.get("取用方式") if "取用方式" in kwargs else kwargs.get("pick", "前N条")
+        n = int(kwargs.get("数量") if "数量" in kwargs else kwargs.get("n", 8))
+        language = kwargs.get("语言") if "语言" in kwargs else kwargs.get("language", "zh")
+        panel_text = kwargs.get("面板文本") if "面板文本" in kwargs else kwargs.get("panel_text", "")
+        seed = int(kwargs.get("随机种子") if "随机种子" in kwargs else kwargs.get("seed", 0))
+        include_misc = bool(kwargs.get("含素材池") if "含素材池" in kwargs else kwargs.get("include_misc", False))
+        include_nsfw = bool(kwargs.get("含NSFW") if "含NSFW" in kwargs else kwargs.get("include_nsfw", False))
+        scan_limit = int(kwargs.get("扫描上限") if "扫描上限" in kwargs else kwargs.get("scan_limit", 300))
 
-        # 搜索模式下空 query 且无范围 → 友好提示
-        if mode == "搜索" and not (query or "").strip():
-            if _parse_cat_id(category) is None and not (subcategory_filter or "").strip():
-                return (
-                    "",
-                    "请输入关键词，或先选大类 / 填写中类过滤后再搜索。",
-                    0,
-                )
+        panel = (panel_text or "").strip()
+        if panel:
+            return (panel, panel, panel.count(",") + 1 if panel else 0)
 
-        # 分类浏览无大类且无中类过滤时，要求至少限定范围
-        if mode == "分类浏览":
-            if _parse_cat_id(category) is None and not (subcategory_filter or "").strip():
-                return (
-                    "",
-                    "分类浏览请先选择大类，或填写中类名称过滤（如：景别）。",
-                    0,
-                )
-
-        candidates = _collect_entries(
+        rows = _collect_entries(
             mode=mode,
-            query=query,
-            category=category,
-            subcategory_filter=subcategory_filter,
+            query=query or "",
+            category=category or "全部",
+            subcategory_filter=subcategory_filter or "",
             include_misc=include_misc,
             limit_scan=scan_limit,
+            include_nsfw=include_nsfw,
         )
-        chosen = _pick(candidates, pick, n, seed)
-        text = _join([dictionary_service.display_text(e, language) for e in chosen])
-        preview = _preview(candidates, language)
-        if not candidates:
-            preview = "无命中。可尝试更短关键词、换大类，或检查中类过滤写法。"
-        return (text, preview, len(candidates))
+        total = len(rows)
+        if not rows:
+            return ("", "无匹配词条", 0)
 
+        if pick == "仅第1条":
+            chosen = rows[:1]
+        elif pick == "随机N条":
+            rng = random.Random(_effective_seed(seed))
+            k = min(n, len(rows))
+            chosen = rng.sample(rows, k)
+        else:
+            chosen = rows[:n]
 
-# ---------------------------------------------------------------------------
-# 节点 2：字典管理（添加 / 收藏）
-# ---------------------------------------------------------------------------
+        texts = [_display(e, language) for e in chosen]
+        text = _join(texts)
+        preview = "\n".join(f"{i+1}. {t}" for i, t in enumerate(texts))
+        return (text, preview, total)
 
-class PromptKitDictionaryManage:
-    """
-    字典侧写操作：添加自定义词条、按关键词收藏/取消收藏、列出收藏。
-    收藏不依赖手填 id：用「搜索第一条命中」来定位。
-    """
-
-    @classmethod
-    def INPUT_TYPES(cls) -> Dict[str, Any]:
-        return {
-            "required": {
-                "action": (
-                    [
-                        "列出收藏",
-                        "收藏：搜索第一条",
-                        "取消收藏：搜索第一条",
-                        "添加词条",
-                    ],
-                    {"default": "列出收藏"},
-                ),
-                "query": (
-                    "STRING",
-                    {
-                        "default": "",
-                        "multiline": False,
-                        "tooltip": "收藏/取消时：用于定位词条的关键词；添加时作英文 text",
-                    },
-                ),
-                "category": (_cat_choices(True), {"default": "全部"}),
-                "text_zh": (
-                    "STRING",
-                    {
-                        "default": "",
-                        "multiline": False,
-                        "tooltip": "添加词条时的中文；收藏操作可忽略",
-                    },
-                ),
-                "subcategory_filter": (
-                    "STRING",
-                    {
-                        "default": "",
-                        "multiline": False,
-                        "tooltip": "添加词条时必填中类线索（如：表情）；收藏时可选缩小范围",
-                    },
-                ),
-                "language": (["zh", "en", "both"], {"default": "zh"}),
-            },
-            "optional": {
-                "tags": ("STRING", {"default": "", "multiline": False}),
-            },
-        }
-
-    RETURN_TYPES = ("STRING", "STRING")
-    RETURN_NAMES = ("message", "detail")
-    FUNCTION = "run"
-    CATEGORY = "PromptKit/字典/管理"
-    SEARCH_ALIASES = ["pk", "PK", "promptkit", "字典", "收藏", "添加词条", "字典管理"]
-    DESCRIPTION = "添加词条 / 收藏管理。收藏用关键词定位，无需手填 id。节点上可点「打开字典面板」。"
-
-    def run(
-        self,
-        action: str,
-        query: str,
-        category: str,
-        text_zh: str,
-        subcategory_filter: str,
-        language: str,
-        tags: str = "",
-    ) -> Tuple[str, str]:
-        action = (action or "").strip()
-        query = (query or "").strip()
-        text_zh = (text_zh or "").strip()
-        tag_list = [t.strip() for t in (tags or "").split(",") if t.strip()]
-
-        if action == "列出收藏":
-            fav_ids = dictionary_service.list_favorites()
-            lines = []
-            texts = []
-            for eid in fav_ids:
-                e = dictionary_service.get_entry_by_id(eid, include_misc=True)
-                if not e:
-                    lines.append(f"(缺失) {eid}")
-                    continue
-                d = dictionary_service.display_text(e, language)
-                lines.append(f"• {d}  [{eid}]")
-                texts.append(d)
-            msg = f"收藏共 {len(fav_ids)} 条"
-            detail = _join(texts) if texts else "（空）"
-            if lines:
-                detail = detail + "\n\n" + "\n".join(lines[:50])
-            return (msg, detail)
-
-        if action in ("收藏：搜索第一条", "取消收藏：搜索第一条"):
-            if not query:
-                return ("请填写 query 关键词以定位词条", "")
-            sub_ids = _resolve_sub_ids(category, subcategory_filter, include_misc=True)
-            hits = dictionary_service.search(
-                query,
-                subcategory_ids=sub_ids,
-                include_misc=True,
-                language="both",
-                limit=5,
-            )
-            if not hits:
-                return (f"未找到与「{query}」匹配的词条", "")
-            target = hits[0]
-            eid = target.get("id") or ""
-            disp = dictionary_service.display_text(target, language)
-            if action.startswith("收藏"):
-                dictionary_service.add_favorite(eid)
-                return (f"已收藏：{disp}", eid)
-            dictionary_service.remove_favorite(eid)
-            return (f"已取消收藏：{disp}", eid)
-
-        if action == "添加词条":
-            text_en = query  # 约定：query 字段复用为英文 text
-            if not text_en and not text_zh:
-                return ("添加失败：请至少填写 query（英文）或 text_zh（中文）", "")
-            sub_ids = _resolve_sub_ids(category, subcategory_filter, include_misc=True)
-            if not sub_ids:
-                return (
-                    "添加失败：请选择大类，并填写中类线索（subcategory_filter，如：景别、基础表情）",
-                    "",
-                )
-            # 若过滤出多个中类，取第一个；更稳妥是要求用户写准中类名
-            sid = sub_ids[0]
-            if len(sub_ids) > 1:
-                # 优先精确匹配中类名
-                kw = (subcategory_filter or "").strip().lower()
-                tree = dictionary_service.get_category_tree(include_misc=True)
-                for c in tree:
-                    for ch in c.get("children", []):
-                        if (ch.get("name") or "").lower() == kw or (ch.get("id") or "").lower() == kw:
-                            sid = ch["id"]
-                            break
-            entry = dictionary_service.add_user_entry(
-                sid,
-                text=(text_en or text_zh),
-                text_zh=text_zh,
-                tags=tag_list,
-            )
-            return (
-                f"已添加至 {sid}：{dictionary_service.display_text(entry, language)}",
-                entry.get("id", ""),
-            )
-
-        return (f"未知操作：{action}", "")
-
-
-
-# ---------------------------------------------------------------------------
-# 节点 3：字典面板锚点（主要靠前端弹层选词，输出 panel_text）
-# ---------------------------------------------------------------------------
 
 class PromptKitDictionaryPanel:
-    """
-    字典面板入口：画布上点「打开字典面板」勾选词条，结果写入本节点 text 并输出。
-    可与「字典选词」并用；本节点更适合纯点选工作流。
-    """
-
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "panel_text": (
+                "面板文本": (
                     "STRING",
-                    {
-                        "default": "",
-                        "multiline": True,
-                        "tooltip": "由「打开字典面板」写入选中词条",
-                    },
+                    {"default": "", "multiline": True, "tooltip": "由「打开字典面板」写入选中词条"},
                 ),
             },
             "optional": {
-                "separator": ("STRING", {"default": ", "}),
+                "分隔符": ("STRING", {"default": ", ", "tooltip": "多词条拼接分隔符"}),
             },
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("text",)
+    RETURN_NAMES = ("文本",)
     FUNCTION = "run"
     CATEGORY = "PromptKit/字典/选词"
-    SEARCH_ALIASES = ["pk", "PK", "promptkit", "字典", "字典面板", "面板"]
+    SEARCH_ALIASES = ["pk", "promptkit", "字典", "字典面板"]
     DESCRIPTION = "打开字典面板点选词条，输出拼接文本。"
 
-    def run(self, panel_text: str, separator: str = ", ") -> tuple:
+    def run(self, **kwargs) -> tuple:
+        panel_text = kwargs.get("面板文本") if "面板文本" in kwargs else kwargs.get("panel_text", "")
+        separator = kwargs.get("分隔符") if "分隔符" in kwargs else kwargs.get("separator", ", ")
         text = (panel_text or "").strip()
         if not text:
             return ("",)
-        # 若用户从面板写入已是逗号拼接，直接返回；否则按行合并
         if "\n" in text and separator not in text.split("\n")[0]:
             parts = [ln.strip().rstrip(",") for ln in text.splitlines() if ln.strip()]
             sep = separator if separator is not None else ", "
@@ -487,22 +281,88 @@ class PromptKitDictionaryPanel:
         return (text,)
 
 
-# ---------------------------------------------------------------------------
-# 注册
-# ---------------------------------------------------------------------------
+class PromptKitDictionaryAdd:
+    """独立新增字典词条节点。"""
 
-# ---------------------------------------------------------------------------
-# 注册（只暴露打磨后的 2 个节点；旧 4 节点移除）
-# ---------------------------------------------------------------------------
+    @classmethod
+    def INPUT_TYPES(cls) -> Dict[str, Any]:
+        # 中类下拉：扁平 name（带大类前缀便于识别）
+        tree = dictionary_service.get_category_tree(include_misc=True, include_nsfw=True)
+        sub_labels = []
+        for c in tree:
+            cname = c.get("name") or c.get("id")
+            for ch in c.get("children", []):
+                n = ch.get("name") or ch.get("id")
+                sub_labels.append(f"{cname} / {n}")
+        if not sub_labels:
+            sub_labels = ["(无分类)"]
+        return {
+            "required": {
+                "中类": (sub_labels, {"default": sub_labels[0], "tooltip": "词条所属中类"}),
+                "中文词条": (
+                    "STRING",
+                    {"default": "", "multiline": True, "tooltip": "中文 text_zh（必填其一）"},
+                ),
+                "英文词条": (
+                    "STRING",
+                    {"default": "", "multiline": True, "tooltip": "英文 text（可空）"},
+                ),
+                "标签": (
+                    "STRING",
+                    {"default": "", "multiline": False, "tooltip": "标签，逗号分隔"},
+                ),
+            },
+        }
+
+    RETURN_TYPES = ("STRING", "STRING")
+    RETURN_NAMES = ("结果", "词条ID")
+    FUNCTION = "run"
+    CATEGORY = "PromptKit/字典/管理"
+    SEARCH_ALIASES = ["pk", "promptkit", "字典", "新增", "添加词条"]
+    DESCRIPTION = "向指定中类新增一条字典词条（写入用户覆盖层）。"
+
+    def run(self, **kwargs) -> Tuple[str, str]:
+        sub_label = kwargs.get("中类") if "中类" in kwargs else kwargs.get("subcategory", "")
+        text_zh = (kwargs.get("中文词条") if "中文词条" in kwargs else kwargs.get("text_zh", "")) or ""
+        text_en = (kwargs.get("英文词条") if "英文词条" in kwargs else kwargs.get("text", "")) or ""
+        tags_s = (kwargs.get("标签") if "标签" in kwargs else kwargs.get("tags", "")) or ""
+        text_zh = text_zh.strip()
+        text_en = text_en.strip()
+        if not text_zh and not text_en:
+            return ("请填写中文或英文词条", "")
+        # resolve subcategory id from "大类 / 中类"
+        sid = ""
+        tree = dictionary_service.get_category_tree(include_misc=True, include_nsfw=True)
+        target = (sub_label or "").split("/")[-1].strip()
+        for c in tree:
+            for ch in c.get("children", []):
+                n = (ch.get("name") or "").strip()
+                if n == target or f"{c.get('name')} / {n}" == (sub_label or "").strip():
+                    sid = ch.get("id") or ""
+                    break
+            if sid:
+                break
+        if not sid:
+            return (f"未找到中类：{sub_label}", "")
+        tags = [x.strip() for x in tags_s.replace("，", ",").split(",") if x.strip()]
+        entry = dictionary_service.add_user_entry(
+            sid,
+            text=text_en or text_zh,
+            text_zh=text_zh,
+            tags=tags,
+        )
+        disp = dictionary_service.display_text(entry, "zh")
+        return (f"已添加：{disp}", entry.get("id") or "")
+
 
 NODE_CLASS_MAPPINGS = {
     "PromptKitDictionaryPick": PromptKitDictionaryPick,
-    "PromptKitDictionaryManage": PromptKitDictionaryManage,
     "PromptKitDictionaryPanel": PromptKitDictionaryPanel,
+    "PromptKitDictionaryAdd": PromptKitDictionaryAdd,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "PromptKitDictionaryPick": "PromptKit · 字典选词",
-    "PromptKitDictionaryManage": "PromptKit · 字典管理",
     "PromptKitDictionaryPanel": "PromptKit · 字典面板",
+    "PromptKitDictionaryAdd": "PromptKit · 新增字典词条",
 }

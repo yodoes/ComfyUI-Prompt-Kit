@@ -25,11 +25,13 @@ try:
     @PromptServer.instance.routes.get(f"{BASE}/tree")
     async def pk_tree(request: web.Request) -> web.Response:
         include_misc = request.query.get("include_misc", "0") in ("1", "true", "True")
+        include_nsfw = request.query.get("include_nsfw", "0") in ("1", "true", "True")
         language = request.query.get("lang", "zh")
         tree = dictionary_service.get_category_tree(
-            include_misc=include_misc, language=language
+            include_misc=include_misc,
+            include_nsfw=include_nsfw,
+            language=language,
         )
-        # 附上每个中类的条数（轻量：只读缓存或文件行数会慢；此处不强制全量 count）
         return _json_ok(tree=tree)
 
     @PromptServer.instance.routes.get(f"{BASE}/entries")
@@ -66,6 +68,7 @@ try:
         category = (request.query.get("category") or "").strip()
         sub_filter = (request.query.get("subcategory") or "").strip()
         include_misc = request.query.get("include_misc", "0") in ("1", "true", "True")
+        include_nsfw = request.query.get("include_nsfw", "0") in ("1", "true", "True")
         language = request.query.get("lang", "zh")
         try:
             limit = min(200, max(1, int(request.query.get("limit") or 50)))
@@ -74,7 +77,9 @@ try:
 
         sub_ids = None
         if category or sub_filter:
-            tree = dictionary_service.get_category_tree(include_misc=include_misc)
+            tree = dictionary_service.get_category_tree(
+                include_misc=include_misc, include_nsfw=include_nsfw
+            )
             sub_ids = []
             kw = sub_filter.lower()
             for c in tree:
@@ -98,6 +103,7 @@ try:
                 q,
                 subcategory_ids=sub_ids,
                 include_misc=include_misc,
+                include_nsfw=include_nsfw,
                 language="both",
                 limit=limit,
             )
@@ -184,6 +190,48 @@ try:
             text_zh=text_zh,
             tags=tags if isinstance(tags, list) else [],
         )
+        return _json_ok(entry=entry)
+
+
+    @PromptServer.instance.routes.post(f"{BASE}/entry/delete")
+    async def pk_delete_entry(request: web.Request) -> web.Response:
+        try:
+            data = await request.json()
+        except Exception as e:
+            return _json_err(f"JSON 无效: {e}")
+        entry_id = (data.get("id") or "").strip()
+        if not entry_id:
+            return _json_err("缺少 id")
+        ok = dictionary_service.delete_entry(
+            entry_id,
+            subcategory_id=(data.get("subcategory") or "").strip(),
+        )
+        if not ok:
+            return _json_err("删除失败或词条不存在", 404)
+        return _json_ok(deleted=entry_id)
+
+    @PromptServer.instance.routes.post(f"{BASE}/entry/update")
+    async def pk_update_entry(request: web.Request) -> web.Response:
+        try:
+            data = await request.json()
+        except Exception as e:
+            return _json_err(f"JSON 无效: {e}")
+        entry_id = (data.get("id") or "").strip()
+        if not entry_id:
+            return _json_err("缺少 id")
+        updates = {}
+        for k in ("text", "text_zh", "tags", "nsfw", "note"):
+            if k in data:
+                updates[k] = data[k]
+        if not updates:
+            return _json_err("无更新字段")
+        entry = dictionary_service.update_entry(
+            entry_id,
+            updates,
+            subcategory_id=(data.get("subcategory") or "").strip(),
+        )
+        if not entry:
+            return _json_err("词条不存在或更新失败", 404)
         return _json_ok(entry=entry)
 
     print("[Prompt-Kit] API routes registered: /prompt-kit/*")

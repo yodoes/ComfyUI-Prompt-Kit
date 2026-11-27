@@ -19,6 +19,7 @@ DEFAULT_SETTINGS: Dict[str, Any] = {
     "prefix": "",
     "suffix": "",
     "reload_on_change": True,
+    "include_nsfw": False,
 }
 
 
