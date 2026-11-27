@@ -19,16 +19,20 @@ class Paths:
         # 阶段 4 结构化生成（独立于字典）
         self.builder: Path = self.data / "builder"
         self.builder_nsfw: Path = self.data / "builder_nsfw"
+        # Skill 资产（系统只读示例）
+        self.skills: Path = self.data / "skills"
 
         self.user_data: Path = self.root / "user_data"
         self.user_dictionary: Path = self.user_data / "dictionary"
         self.user_library: Path = self.user_data / "library"
         self.user_builder: Path = self.user_data / "builder"
         self.user_builder_nsfw: Path = self.user_data / "builder_nsfw"
+        self.user_skills: Path = self.user_data / "skills"
 
         self.settings_file: Path = self.user_data / "settings.json"
         self.favorites_file: Path = self.user_data / "favorites.json"
         self.library_favorites_file: Path = self.user_data / "library_favorites.json"
+        self.skill_favorites_file: Path = self.user_data / "skill_favorites.json"
 
         self.dictionary_index: Path = self.dictionary / "index.json"
         self.dictionary_nsfw_index: Path = self.dictionary_nsfw / "index.json"
@@ -45,6 +49,7 @@ class Paths:
         self.user_library.mkdir(parents=True, exist_ok=True)
         self.user_builder.mkdir(parents=True, exist_ok=True)
         self.user_builder_nsfw.mkdir(parents=True, exist_ok=True)
+        self.user_skills.mkdir(parents=True, exist_ok=True)
 
     def builder_slot_file(self, slot_id: str, nsfw: bool = False) -> Path:
         """系统精选：某槽位 jsonl 路径。"""

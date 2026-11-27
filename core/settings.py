@@ -21,6 +21,12 @@ DEFAULT_SETTINGS: Dict[str, Any] = {
     "reload_on_change": True,
     "include_nsfw": False,
     "library_join_mode": "newline",
+    # Skill 功能
+    "skill_ollama_enabled": False,
+    "skill_ollama_base_url": "http://127.0.0.1:11434",
+    "skill_ollama_model": "",
+    "skill_ollama_timeout_sec": 60,
+    "skill_export_dir": "",
 }
 
 

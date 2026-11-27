@@ -15,6 +15,7 @@ try:
     from .dictionary_service import dictionary_service
     from .library_service import library_service
     from .builder_service import builder_service
+    from .skill_service import skill_service
 
     BASE = "/prompt-kit"
 
@@ -678,7 +679,261 @@ try:
         except Exception as e:
             return _json_err(str(e))
 
-    print("[Prompt-Kit] API routes registered: /prompt-kit/* (+ library + builder)")
+    # ------------------------------------------------------------------
+    # Skill
+    # ------------------------------------------------------------------
+
+    @PromptServer.instance.routes.get(f"{BASE}/skill/list")
+    async def pk_skill_list(request: web.Request) -> web.Response:
+        q = (request.query.get("q") or "").strip()
+        tag = (request.query.get("tag") or "").strip()
+        source = (request.query.get("source") or "").strip()
+        tags = [tag] if tag else None
+        rows = skill_service.list_skills(q=q, tags=tags, source=source)
+        return _json_ok(skills=rows, total=len(rows))
+
+    @PromptServer.instance.routes.get(f"{BASE}/skill/get")
+    async def pk_skill_get(request: web.Request) -> web.Response:
+        name = (request.query.get("name") or "").strip()
+        if not name:
+            return _json_err("缺少 name")
+        try:
+            skill = skill_service.get_skill(name)
+        except ValueError as e:
+            return _json_err(str(e))
+        if not skill:
+            return _json_err("未找到 Skill", 404)
+        return _json_ok(skill=skill)
+
+    @PromptServer.instance.routes.post(f"{BASE}/skill/save")
+    async def pk_skill_save(request: web.Request) -> web.Response:
+        try:
+            data = await request.json()
+        except Exception as e:
+            return _json_err(f"JSON 无效: {e}")
+        name = str(data.get("name") or "").strip()
+        if not name:
+            return _json_err("缺少 name")
+        overwrite = bool(data.get("overwrite"))
+        description = str(data.get("description") or "")
+        body = str(data.get("body") or "")
+        tags = data.get("tags")
+        if isinstance(tags, str):
+            tags = [t.strip() for t in tags.replace("，", ",").split(",") if t.strip()]
+        display_name_zh = str(data.get("display_name_zh") or "")
+        try:
+            existing = None
+            try:
+                existing = skill_service.get_skill(name)
+            except ValueError:
+                existing = None
+            if existing and existing.get("source") in ("user", "user-override") and not data.get("force_create"):
+                skill = skill_service.update_skill(
+                    name,
+                    description=description if "description" in data else None,
+                    body=body if "body" in data else None,
+                    tags=tags if tags is not None else None,
+                    display_name_zh=display_name_zh if "display_name_zh" in data else None,
+                )
+            else:
+                skill = skill_service.create_skill(
+                    name,
+                    description=description,
+                    body=body,
+                    tags=tags,
+                    display_name_zh=display_name_zh,
+                    overwrite=overwrite,
+                )
+            return _json_ok(skill=skill)
+        except Exception as e:
+            return _json_err(str(e))
+
+    @PromptServer.instance.routes.post(f"{BASE}/skill/delete")
+    async def pk_skill_delete(request: web.Request) -> web.Response:
+        try:
+            data = await request.json()
+        except Exception as e:
+            return _json_err(f"JSON 无效: {e}")
+        name = str(data.get("name") or "").strip()
+        if not name:
+            return _json_err("缺少 name")
+        try:
+            ok = skill_service.delete_skill(name)
+            return _json_ok(deleted=name, ok=ok)
+        except Exception as e:
+            return _json_err(str(e))
+
+    @PromptServer.instance.routes.post(f"{BASE}/skill/favorite")
+    async def pk_skill_favorite(request: web.Request) -> web.Response:
+        try:
+            data = await request.json()
+        except Exception as e:
+            return _json_err(f"JSON 无效: {e}")
+        name = str(data.get("name") or "").strip()
+        if not name:
+            return _json_err("缺少 name")
+        try:
+            fav = skill_service.toggle_favorite(name)
+            return _json_ok(name=name, favorite=fav)
+        except Exception as e:
+            return _json_err(str(e))
+
+    @PromptServer.instance.routes.post(f"{BASE}/skill/generate")
+    async def pk_skill_generate(request: web.Request) -> web.Response:
+        try:
+            data = await request.json()
+        except Exception as e:
+            return _json_err(f"JSON 无效: {e}")
+        kind = str(data.get("kind") or "from_prompt")
+        fields = data.get("fields") if isinstance(data.get("fields"), dict) else data
+        save = bool(data.get("save"))
+        overwrite = bool(data.get("overwrite"))
+        polish = bool(data.get("polish"))
+        try:
+            meta, body = skill_service.render_template(kind, fields or {})
+            warning = None
+            if polish:
+                meta, body, warning = skill_service.polish_with_ollama(meta, body)
+            skill = None
+            if save:
+                tags = meta.get("tags") or fields.get("tags")
+                if isinstance(tags, str):
+                    tags = [t.strip() for t in tags.split(",") if t.strip()]
+                skill = skill_service.create_skill(
+                    meta["name"],
+                    meta.get("description") or "",
+                    body,
+                    tags=tags,
+                    display_name_zh=str(fields.get("title_zh") or fields.get("display_name_zh") or ""),
+                    overwrite=overwrite,
+                )
+            return _json_ok(meta=meta, body=body, skill=skill, warning=warning)
+        except Exception as e:
+            return _json_err(str(e))
+
+    @PromptServer.instance.routes.get(f"{BASE}/skill/settings")
+    async def pk_skill_settings_get(request: web.Request) -> web.Response:
+        from .settings import settings
+
+        data = settings.load()
+        keys = (
+            "skill_ollama_enabled",
+            "skill_ollama_base_url",
+            "skill_ollama_model",
+            "skill_ollama_timeout_sec",
+            "skill_export_dir",
+        )
+        out = {k: data.get(k) for k in keys}
+        return _json_ok(settings=out)
+
+    @PromptServer.instance.routes.post(f"{BASE}/skill/settings")
+    async def pk_skill_settings_set(request: web.Request) -> web.Response:
+        from .settings import settings
+
+        try:
+            data = await request.json()
+        except Exception as e:
+            return _json_err(f"JSON 无效: {e}")
+        cur = settings.load()
+        if "skill_ollama_enabled" in data:
+            cur["skill_ollama_enabled"] = bool(data.get("skill_ollama_enabled"))
+        if "skill_ollama_base_url" in data:
+            cur["skill_ollama_base_url"] = str(data.get("skill_ollama_base_url") or "").strip() or "http://127.0.0.1:11434"
+        if "skill_ollama_model" in data:
+            cur["skill_ollama_model"] = str(data.get("skill_ollama_model") or "").strip()
+        if "skill_ollama_timeout_sec" in data:
+            try:
+                cur["skill_ollama_timeout_sec"] = max(5, int(data.get("skill_ollama_timeout_sec") or 60))
+            except (TypeError, ValueError):
+                cur["skill_ollama_timeout_sec"] = 60
+        if "skill_export_dir" in data:
+            cur["skill_export_dir"] = str(data.get("skill_export_dir") or "").strip()
+        settings._data = cur
+        settings.save()
+        keys = (
+            "skill_ollama_enabled",
+            "skill_ollama_base_url",
+            "skill_ollama_model",
+            "skill_ollama_timeout_sec",
+            "skill_export_dir",
+        )
+        return _json_ok(settings={k: cur.get(k) for k in keys})
+
+    @PromptServer.instance.routes.get(f"{BASE}/skill/ollama/models")
+    async def pk_skill_ollama_models(request: web.Request) -> web.Response:
+        """从本机 Ollama 拉取已安装模型列表（服务端请求，避免浏览器跨域）。"""
+        import json
+        import urllib.error
+        import urllib.request
+
+        from .settings import settings
+
+        base = (request.query.get("base_url") or "").strip()
+        if not base:
+            base = str(settings.get("skill_ollama_base_url") or "http://127.0.0.1:11434")
+        base = base.rstrip("/")
+        url = f"{base}/api/tags"
+        try:
+            req = urllib.request.Request(url, method="GET")
+            with urllib.request.urlopen(req, timeout=8) as resp:
+                raw = resp.read().decode("utf-8", errors="replace")
+            data = json.loads(raw)
+            models = []
+            for m in data.get("models") or []:
+                name = (m.get("name") or m.get("model") or "").strip()
+                if name and name not in models:
+                    models.append(name)
+            models.sort(key=str.casefold)
+            return _json_ok(models=models, base_url=base)
+        except urllib.error.URLError as e:
+            return _json_err(f"无法连接 Ollama（{base}）: {e}", 502)
+        except Exception as e:
+            return _json_err(f"获取模型列表失败: {e}", 502)
+
+    @PromptServer.instance.routes.post(f"{BASE}/skill/import")
+    async def pk_skill_import(request: web.Request) -> web.Response:
+        try:
+            data = await request.json()
+        except Exception as e:
+            return _json_err(f"JSON 无效: {e}")
+        path = str(data.get("path") or "").strip()
+        if not path:
+            return _json_err("缺少 path")
+        overwrite = bool(data.get("overwrite"))
+        try:
+            skill = skill_service.import_path(path, overwrite=overwrite)
+            return _json_ok(skill=skill)
+        except Exception as e:
+            return _json_err(str(e))
+
+    @PromptServer.instance.routes.post(f"{BASE}/skill/export")
+    async def pk_skill_export(request: web.Request) -> web.Response:
+        try:
+            data = await request.json()
+        except Exception as e:
+            return _json_err(f"JSON 无效: {e}")
+        name = str(data.get("name") or "").strip()
+        if not name:
+            return _json_err("缺少 name")
+        dest = str(data.get("dest_dir") or "").strip()
+        if not dest:
+            from .settings import settings
+            dest = str(settings.get("skill_export_dir") or "").strip()
+        if not dest:
+            return _json_err("缺少 dest_dir（可在 settings.skill_export_dir 配置默认导出目录）")
+        try:
+            path = skill_service.export_skill(name, dest)
+            return _json_ok(path=str(path))
+        except Exception as e:
+            return _json_err(str(e))
+
+    @PromptServer.instance.routes.post(f"{BASE}/skill/reload")
+    async def pk_skill_reload(request: web.Request) -> web.Response:
+        skill_service.reload()
+        n = len(skill_service.list_skills())
+        return _json_ok(total=n)
+
+    print("[Prompt-Kit] API routes registered: /prompt-kit/* (+ library + builder + skill)")
 
 except ImportError:
     # 非 ComfyUI 环境
