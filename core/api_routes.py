@@ -14,6 +14,7 @@ try:
 
     from .dictionary_service import dictionary_service
     from .library_service import library_service
+    from .builder_service import builder_service
 
     BASE = "/prompt-kit"
 
@@ -447,7 +448,237 @@ try:
             return _json_err("词条不存在或更新失败", 404)
         return _json_ok(entry=entry)
 
-    print("[Prompt-Kit] API routes registered: /prompt-kit/* (+ library)")
+    # ------------------------------------------------------------------
+    # 结构化生成 builder
+    # ------------------------------------------------------------------
+
+    def _query_bool(request: web.Request, key: str, default: bool = False) -> bool:
+        v = request.query.get(key)
+        if v is None:
+            return default
+        return str(v).lower() in ("1", "true", "yes", "on")
+
+    @PromptServer.instance.routes.get(f"{BASE}/builder/slots")
+    async def pk_builder_slots(request: web.Request) -> web.Response:
+        nsfw = _query_bool(request, "nsfw", False)
+        slots = builder_service.list_slots(nsfw=nsfw)
+        order = builder_service.compose_order(nsfw=nsfw)
+        return _json_ok(slots=slots, compose_order=order, nsfw=nsfw)
+
+    @PromptServer.instance.routes.get(f"{BASE}/builder/slot/{{slot_id}}")
+    async def pk_builder_slot(request: web.Request) -> web.Response:
+        slot_id = (request.match_info.get("slot_id") or "").strip()
+        if not slot_id:
+            return _json_err("缺少 slot_id")
+        nsfw = _query_bool(request, "nsfw", False)
+        q = (request.query.get("q") or "").strip()
+        group = (request.query.get("group") or "").strip()
+        try:
+            limit = int(request.query.get("limit") or 500)
+        except ValueError:
+            limit = 500
+        terms = builder_service.search_slot(
+            slot_id, q=q, group=group, nsfw=nsfw, limit=max(1, min(limit, 2000))
+        )
+        return _json_ok(slot_id=slot_id, terms=terms, count=len(terms), nsfw=nsfw)
+
+    @PromptServer.instance.routes.post(f"{BASE}/builder/compose")
+    async def pk_builder_compose(request: web.Request) -> web.Response:
+        try:
+            data = await request.json()
+        except Exception as e:
+            return _json_err(f"JSON 无效: {e}")
+        selected = data.get("selected") or {}
+        if not isinstance(selected, dict):
+            return _json_err("selected 须为对象")
+        # 规范为 str -> list[str]
+        norm: Dict[str, List[str]] = {}
+        for k, v in selected.items():
+            if v is None:
+                continue
+            if isinstance(v, list):
+                norm[str(k)] = [str(x) for x in v if x is not None and str(x).strip()]
+            else:
+                norm[str(k)] = [str(v)]
+        enabled = data.get("enabled")
+        if enabled is not None and not isinstance(enabled, dict):
+            return _json_err("enabled 须为对象")
+        nsfw = bool(data.get("nsfw", False))
+        separator = data.get("separator")
+        if separator is not None:
+            separator = str(separator)
+        dedupe = bool(data.get("dedupe", True))
+        enable_weight = bool(data.get("enable_weight", False))
+        prefix = str(data.get("prefix") or "")
+        suffix = str(data.get("suffix") or "")
+        try:
+            result = builder_service.compose(
+                norm,
+                nsfw=nsfw,
+                separator=separator,
+                dedupe=dedupe,
+                enable_weight=enable_weight,
+                prefix=prefix,
+                suffix=suffix,
+                enabled=enabled,
+            )
+            return _json_ok(**result)
+        except Exception as e:
+            return _json_err(str(e))
+
+    
+    @PromptServer.instance.routes.get(f"{BASE}/builder/presets")
+    async def pk_builder_presets(_request: web.Request) -> web.Response:
+        """官方组词预设列表。"""
+        items = [
+            {"id": "portrait_general", "name_zh": "通用人像", "era": "关闭"},
+            {"id": "guofeng", "name_zh": "国风中式", "era": "古风中式"},
+            {"id": "xianxia", "name_zh": "仙侠", "era": "仙侠玄幻"},
+        ]
+        return _json_ok(presets=items)
+
+    @PromptServer.instance.routes.post(f"{BASE}/builder/preset/apply")
+    async def pk_builder_preset_apply(request: web.Request) -> web.Response:
+        """按预设抽取词条 id，供面板填充已选。"""
+        try:
+            data = await request.json()
+        except Exception as e:
+            return _json_err(f"JSON 无效: {e}")
+        pid = str(data.get("id") or data.get("preset") or "").strip()
+        seed = int(data.get("seed") or 0)
+        if seed == 0:
+            import time as _time
+            seed = int(_time.time_ns() % (2**31))
+
+        # 预设定义：slot -> [(group, n)]
+        table = {
+            "portrait_general": {
+                "era": "关闭",
+                "picks": [
+                    ("subject", "性别", 1),
+                    ("subject", "年龄段", 1),
+                    ("subject", "气质", 1),
+                    ("expression", "表情", 1),
+                    ("pose", "站姿", 1),
+                    ("clothing", "套装", 1),
+                    ("scene", "地点", 1),
+                    ("lighting", "氛围", 1),
+                ],
+            },
+            "guofeng": {
+                "era": "古风中式",
+                "picks": [
+                    ("style", "时代世界观", 1),
+                    ("style", "文化地域", 1),
+                    ("subject", "性别", 1),
+                    ("subject", "年龄段", 1),
+                    ("subject", "职业身份", 1),
+                    ("hair", "盘发冠髻", 1),
+                    ("clothing", "服饰形制", 1),
+                    ("accessories", "头饰", 1),
+                    ("pose", "站姿", 1),
+                    ("scene", "地点", 1),
+                    ("lighting", "氛围", 1),
+                ],
+            },
+            "xianxia": {
+                "era": "仙侠玄幻",
+                "picks": [
+                    ("style", "时代世界观", 1),
+                    ("subject", "性别", 1),
+                    ("subject", "气质", 1),
+                    ("subject", "职业身份", 1),
+                    ("hair", "发质动态", 1),
+                    ("clothing", "服饰形制", 1),
+                    ("accessories", "手持", 1),
+                    ("pose", "站姿", 1),
+                    ("scene", "地点", 1),
+                    ("lighting", "主光", 1),
+                ],
+            },
+        }
+        conf = table.get(pid)
+        if not conf:
+            return _json_err(f"未知预设: {pid}")
+        era = conf["era"]
+        selected: Dict[str, List[str]] = {}
+        terms_out: Dict[str, List[Dict[str, Any]]] = {}
+        for i, (sid, group, n) in enumerate(conf["picks"]):
+            ids = builder_service.random_ids(
+                sid,
+                n=n,
+                nsfw=False,
+                seed=(seed + i * 97) & 0xFFFFFFFF,
+                group=group,
+                era="" if era in ("关闭", "") else era,
+            )
+            if not ids:
+                # 无时代命中则放宽
+                ids = builder_service.random_ids(
+                    sid, n=n, nsfw=False, seed=(seed + i * 97 + 3) & 0xFFFFFFFF, group=group, era=""
+                )
+            if not ids:
+                continue
+            selected.setdefault(sid, []).extend(ids)
+            for term in builder_service.get_terms_by_ids(sid, ids, nsfw=False):
+                terms_out.setdefault(sid, []).append(term)
+        return _json_ok(id=pid, era=era, selected=selected, terms=terms_out)
+
+    
+    @PromptServer.instance.routes.post(f"{BASE}/builder/reload")
+    async def pk_builder_reload(request: web.Request) -> web.Response:
+        builder_service.reload()
+        n = len(builder_service.list_slots(nsfw=True))
+        # 各组词量摘要（便于前端提示）
+        counts = {}
+        for s in builder_service.list_slots(nsfw=True):
+            sid = s["id"]
+            rows = builder_service.load_slot(sid, nsfw=bool(s.get("nsfw")))
+            counts[sid] = len(rows)
+        return _json_ok(slots=n, term_counts=counts, message="词表缓存已刷新；节点下拉需重建节点或重启后更新")
+
+    @PromptServer.instance.routes.get(f"{BASE}/builder/validate")
+    async def pk_builder_validate(_request: web.Request) -> web.Response:
+        try:
+            report = builder_service.validate_catalog()
+            return _json_ok(**report)
+        except Exception as e:
+            return _json_err(str(e))
+
+    @PromptServer.instance.routes.post(f"{BASE}/builder/term")
+    async def pk_builder_term(request: web.Request) -> web.Response:
+        try:
+            data = await request.json()
+        except Exception as e:
+            return _json_err(f"JSON 无效: {e}")
+        action = (data.get("action") or "upsert").strip().lower()
+        slot_id = (data.get("slot") or data.get("slot_id") or "").strip()
+        if not slot_id:
+            return _json_err("缺少 slot")
+        try:
+            if action in ("upsert", "add", "update"):
+                entry = builder_service.upsert_term(
+                    slot_id,
+                    text_zh=str(data.get("text_zh") or data.get("text") or ""),
+                    term_id=str(data.get("id") or data.get("term_id") or ""),
+                    group=str(data.get("group") or ""),
+                    nsfw=bool(data.get("nsfw")),
+                    tags=data.get("tags"),
+                )
+                return _json_ok(term=entry)
+            if action == "delete":
+                tid = str(data.get("id") or data.get("term_id") or "").strip()
+                if not tid:
+                    return _json_err("缺少 id")
+                ok = builder_service.delete_term(slot_id, tid)
+                if not ok:
+                    return _json_err("未找到词条或删除失败", 404)
+                return _json_ok(deleted=tid, slot=slot_id)
+            return _json_err(f"未知 action: {action}")
+        except Exception as e:
+            return _json_err(str(e))
+
+    print("[Prompt-Kit] API routes registered: /prompt-kit/* (+ library + builder)")
 
 except ImportError:
     # 非 ComfyUI 环境

@@ -1,10 +1,26 @@
 """
 结构化生成域节点。
-后续在此实现：大节点（14 模块）与各分类独立小节点。
+
+- 大节点：PromptKit · 结构化生成
+- 小节点：11 SFW + 5 NSFW（工厂，见 slot_nodes.py）
 """
 from __future__ import annotations
 
+from .structured import (
+    NODE_CLASS_MAPPINGS as _STRUCT_MAPPINGS,
+    NODE_DISPLAY_NAME_MAPPINGS as _STRUCT_DISPLAY,
+)
+from .slot_nodes import (
+    NODE_CLASS_MAPPINGS as _SLOT_MAPPINGS,
+    NODE_DISPLAY_NAME_MAPPINGS as _SLOT_DISPLAY,
+)
+
 NODE_CLASS_MAPPINGS = {}
+NODE_CLASS_MAPPINGS.update(_STRUCT_MAPPINGS)
+NODE_CLASS_MAPPINGS.update(_SLOT_MAPPINGS)
+
 NODE_DISPLAY_NAME_MAPPINGS = {}
+NODE_DISPLAY_NAME_MAPPINGS.update(_STRUCT_DISPLAY)
+NODE_DISPLAY_NAME_MAPPINGS.update(_SLOT_DISPLAY)
 
 __all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS"]

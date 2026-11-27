@@ -1,0 +1,194 @@
+{
+  "version": 2,
+  "name_zh": "结构化生成槽位",
+  "description": "SFW 独立精选槽位；分组终表 v1.0",
+  "language": "zh",
+  "tag_registry": {
+    "era": [
+      "现代",
+      "古风中式",
+      "仙侠玄幻",
+      "民国年代",
+      "西幻欧式",
+      "科幻未来",
+      "通用"
+    ],
+    "occupation": [
+      "职业-现代",
+      "职业-古风",
+      "职业-仙侠",
+      "职业-民国",
+      "职业-西幻",
+      "职业-科幻",
+      "职业-通用"
+    ]
+  },
+  "compose_order": [
+    "style",
+    "camera",
+    "subject",
+    "face",
+    "hair",
+    "expression",
+    "pose",
+    "clothing",
+    "accessories",
+    "scene",
+    "lighting"
+  ],
+  "slots": [
+    {
+      "id": "style",
+      "name_zh": "风格媒介",
+      "order": 1,
+      "selection_mode": "single_soft",
+      "groups": [
+        "媒介",
+        "风格",
+        "色调",
+        "时代世界观",
+        "文化地域"
+      ],
+      "dictionary_sources": []
+    },
+    {
+      "id": "camera",
+      "name_zh": "镜头构图",
+      "order": 2,
+      "selection_mode": "single_soft",
+      "groups": [
+        "景别",
+        "机位",
+        "构图",
+        "焦距透视"
+      ],
+      "dictionary_sources": []
+    },
+    {
+      "id": "subject",
+      "name_zh": "人物主体",
+      "order": 3,
+      "selection_mode": "multi",
+      "groups": [
+        "性别",
+        "年龄段",
+        "体型",
+        "职业身份",
+        "气质",
+        "人种外貌",
+        "人数规模"
+      ],
+      "dictionary_sources": []
+    },
+    {
+      "id": "face",
+      "name_zh": "面部妆容",
+      "order": 4,
+      "selection_mode": "multi",
+      "groups": [
+        "五官",
+        "妆容",
+        "肤况肤色",
+        "眉眼",
+        "唇妆",
+        "面部特征"
+      ],
+      "dictionary_sources": []
+    },
+    {
+      "id": "hair",
+      "name_zh": "发型发色",
+      "order": 5,
+      "selection_mode": "multi",
+      "groups": [
+        "发色",
+        "长度造型",
+        "刘海",
+        "发质动态",
+        "盘发冠髻"
+      ],
+      "dictionary_sources": []
+    },
+    {
+      "id": "expression",
+      "name_zh": "表情神态",
+      "order": 6,
+      "selection_mode": "single_soft",
+      "groups": [
+        "表情",
+        "眼神情绪",
+        "微表情"
+      ],
+      "dictionary_sources": []
+    },
+    {
+      "id": "pose",
+      "name_zh": "姿态动作",
+      "order": 7,
+      "selection_mode": "multi",
+      "groups": [
+        "站姿",
+        "坐姿",
+        "卧姿",
+        "手部动作",
+        "跪姿",
+        "走跑动势"
+      ],
+      "dictionary_sources": []
+    },
+    {
+      "id": "clothing",
+      "name_zh": "服装穿搭",
+      "order": 8,
+      "selection_mode": "multi",
+      "groups": [
+        "上装",
+        "下装",
+        "套装",
+        "材质颜色",
+        "鞋靴",
+        "服饰形制",
+        "内衣内搭",
+        "外套罩衫"
+      ],
+      "dictionary_sources": []
+    },
+    {
+      "id": "accessories",
+      "name_zh": "配饰道具",
+      "order": 9,
+      "selection_mode": "multi",
+      "groups": [
+        "首饰",
+        "包袋",
+        "眼镜",
+        "手持",
+        "头饰"
+      ],
+      "dictionary_sources": []
+    },
+    {
+      "id": "scene",
+      "name_zh": "场景环境",
+      "order": 10,
+      "selection_mode": "multi",
+      "groups": [
+        "地点",
+        "时间天气",
+        "背景"
+      ],
+      "dictionary_sources": []
+    },
+    {
+      "id": "lighting",
+      "name_zh": "光影氛围",
+      "order": 11,
+      "selection_mode": "multi",
+      "groups": [
+        "主光",
+        "氛围"
+      ],
+      "dictionary_sources": []
+    }
+  ]
+}
