@@ -30,14 +30,9 @@ build/
 *.swo
 .DS_Store
 Thumbs.db
-.workbuddy/
 
 # 日志与临时
 *.log
 *.tmp
 *.bak
 .cache/
-
-# 翻译流水线临时产物（清单 / 译文 / 备份，体积大且可重生成）
-tools/translate/_work/
-tools/
