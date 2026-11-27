@@ -2,7 +2,7 @@
 
 专业级 Prompt 工作台与工具箱。第一阶段聚焦：**字典管理**、**词库/预设管理**、**结构化生成**。
 
-当前版本：`0.6.0-dev`（Skill 资产/生成可试用；结构化 0.4 基线可用）
+当前版本：`0.6.2-dev`（共 27 个节点；字典 / 词库 / 结构化 / Skill 四域可用）
 
 ## 安装
 
@@ -17,14 +17,14 @@
 PromptKit
 ├── 字典
 │   ├── 选词    → 字典选词、字典面板
-│   └── 管理    → 字典管理
+│   └── 管理    → 新增字典词条
 ├── 词库
 │   ├── 选词    → 词库选词、词库面板
-│   └── 管理    → 词库管理
+│   └── 管理    → 快速保存到词库
 ├── 结构化
 │   ├── 结构化生成     → 大节点（11 槽 + 可选 NSFW）
 │   ├── 分模块/*       → 11 个 SFW 小节点
-│   └── NSFW/*         → 5 个 NSFW 附加槽小节点
+│   └── NSFW/*         → 6 个 NSFW 小节点（5 附加槽 + 着装服饰）
 └── Skill
     ├── Skill 面板       → 管理 / 生成 / 导入导出 SKILL.md
     ├── 选 Skill         → 下拉输出正文 / 全文件 / 名称 / 路径
@@ -36,18 +36,18 @@ PromptKit
 | 显示名 | 说明 |
 |--------|------|
 | **PromptKit · 字典选词** | 搜索 / 分类浏览 / 收藏 |
-| **PromptKit · 字典管理** | 列出/收藏/添加词条 |
 | **PromptKit · 字典面板** | 点选工作流入口 |
+| **PromptKit · 新增字典词条** | 按英文词 + 中文 + 大类/中类线索写入用户词条，无需手填 entry_id |
 
 ### 词库（阶段 3）
 
 | 显示名 | 说明 |
 |--------|------|
 | **PromptKit · 词库选词** | 按库 / 分类 / 标签(AND) / 搜索 / 收藏取完整 prompt |
-| **PromptKit · 词库管理** | 新建库、增删预设、收藏、设置标签 |
 | **PromptKit · 词库面板** | Web 面板：库切换、标签筛选、多选应用 |
+| **PromptKit · 快速保存到词库** | 把上游文本存成预设（可选词库、标题、标签、NSFW 标记） |
 
-### Skill（0.6.0-dev）
+### Skill（0.6.x）
 
 | 显示名 | 说明 |
 |--------|------|
@@ -60,7 +60,8 @@ PromptKit
 
 Skill API：
 
-- `GET/POST /prompt-kit/skill/list|get|save|delete|favorite|generate|import|export|reload|settings`
+- `GET  /prompt-kit/skill/{list,get,settings,ollama/models}`
+- `POST /prompt-kit/skill/{save,delete,favorite,generate,import,export,reload,settings}`
 
 ### 结构化生成（阶段 4）
 
@@ -73,7 +74,7 @@ Skill API：
 
 - **独立精选词表**（`data/builder/`），不绑字典 14 类；预留挂字典口子
 - **11 个 SFW 槽**：style / camera / subject / face / hair / expression / pose / clothing / accessories / scene / lighting
-- **NSFW**：面板独立「显示 NSFW」；B 并入原槽 + C 五个附加槽（body / pose / act / props / fluids）
+- **NSFW**：面板独立「显示 NSFW」；B 并入原槽（另设「着装服饰」小节点）+ C 五个附加槽（body / pose / act / props / fluids）
 - **纯中文**输出；全局去重默认开；软单选（单击替换，Ctrl 追加）
 - **实时预览**：面板调用 `POST /prompt-kit/builder/compose`
 - 节点按钮「打开结构化面板」→ 选词 →「应用到节点」
@@ -110,7 +111,7 @@ user_data/skills/         用户 Skill
 | 2 字典管理 + 面板 | ✅ |
 | 3 词库/预设 | ✅ 0.3.x |
 | 4 结构化生成 | ✅ 0.4.x 可试用 |
-| 5 Skill 资产/生成 | ✅ 0.6.0-dev 可试用 |
+| 5 Skill 资产/生成 | ✅ 0.6.2-dev 可试用 |
 
 ## 许可
 
