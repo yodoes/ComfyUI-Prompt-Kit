@@ -1,0 +1,197 @@
+{
+  "id": "demo_characters",
+  "name_zh": "示例角色库",
+  "name_en": "Demo Characters",
+  "description": "系统示例：精简角色向完整提示词，用于演示词库选词与面板。",
+  "version": 1,
+  "categories": [
+    {
+      "id": "female",
+      "name_zh": "女性",
+      "name_en": "Female",
+      "order": 1
+    },
+    {
+      "id": "male",
+      "name_zh": "男性",
+      "name_en": "Male",
+      "order": 2
+    },
+    {
+      "id": "other",
+      "name_zh": "其他",
+      "name_en": "Other",
+      "order": 3
+    }
+  ],
+  "presets": [
+    {
+      "id": "char_001",
+      "title_zh": "古风女侠",
+      "title_en": "Ancient Heroine",
+      "prompt": "一位英姿飒爽的古风女侠，黑色长发高高束起，身着青色劲装，腰佩长剑，眼神坚定，站在山巅迎风而立",
+      "prompt_en": "A valiant ancient Chinese heroine with black hair tied high, wearing cyan martial attire, a long sword at her waist, determined eyes, standing on a mountain peak against the wind",
+      "category_id": "female",
+      "tags": [
+        "古风",
+        "武侠",
+        "女侠",
+        "长剑"
+      ],
+      "favorite": false,
+      "liked": false,
+      "nsfw": false,
+      "source": "system_demo",
+      "note": "",
+      "created_at": "2026-09-29T05:10:06Z",
+      "updated_at": "2026-09-29T05:10:06Z"
+    },
+    {
+      "id": "char_002",
+      "title_zh": "现代都市少女",
+      "title_en": "Modern Urban Girl",
+      "prompt": "一位清新自然的现代都市少女，齐肩短发，白色衬衫配牛仔短裤，肩上挎着帆布包，阳光下微笑，背景是城市街道",
+      "prompt_en": "A fresh modern urban girl with shoulder-length hair, white shirt and denim shorts, a canvas bag on her shoulder, smiling in sunlight, city street background",
+      "category_id": "female",
+      "tags": [
+        "现代",
+        "都市",
+        "日常",
+        "清新"
+      ],
+      "favorite": false,
+      "liked": false,
+      "nsfw": false,
+      "source": "system_demo",
+      "note": "",
+      "created_at": "2026-09-29T05:10:06Z",
+      "updated_at": "2026-09-29T05:10:06Z"
+    },
+    {
+      "id": "char_003",
+      "title_zh": "赛博朋克黑客",
+      "title_en": "Cyberpunk Hacker",
+      "prompt": "一位赛博朋克风格的女黑客，银色短发，左眼有机械义眼，身着黑色机能服，手持全息终端，霓虹灯光映照侧脸",
+      "prompt_en": "A cyberpunk style female hacker with silver short hair, mechanical prosthetic left eye, black techwear, holding a holographic terminal, neon lights reflecting on her face",
+      "category_id": "female",
+      "tags": [
+        "赛博朋克",
+        "黑客",
+        "机能",
+        "霓虹"
+      ],
+      "favorite": false,
+      "liked": false,
+      "nsfw": false,
+      "source": "system_demo",
+      "note": "",
+      "created_at": "2026-09-29T05:10:06Z",
+      "updated_at": "2026-09-29T05:10:06Z"
+    },
+    {
+      "id": "char_004",
+      "title_zh": "白发剑士",
+      "title_en": "White-haired Swordsman",
+      "prompt": "一位沉稳的白发男剑士，身披深灰斗篷，手持古朴长剑，站在雪原中，眼神锐利而平静",
+      "prompt_en": "A composed white-haired male swordsman in a dark gray cloak, holding an ancient long sword, standing in a snowy plain, sharp yet calm eyes",
+      "category_id": "male",
+      "tags": [
+        "白发",
+        "剑士",
+        "雪原",
+        "沉稳"
+      ],
+      "favorite": false,
+      "liked": false,
+      "nsfw": false,
+      "source": "system_demo",
+      "note": "",
+      "created_at": "2026-09-29T05:10:06Z",
+      "updated_at": "2026-09-29T05:10:06Z"
+    },
+    {
+      "id": "char_005",
+      "title_zh": "机甲驾驶员",
+      "title_en": "Mecha Pilot",
+      "prompt": "一位年轻的机甲驾驶员，短发，穿着紧身驾驶服，坐在驾驶舱内，周围是复杂的仪表与全息显示，表情专注",
+      "prompt_en": "A young mecha pilot with short hair, wearing a tight pilot suit, sitting in the cockpit surrounded by complex instruments and holographic displays, focused expression",
+      "category_id": "male",
+      "tags": [
+        "机甲",
+        "驾驶员",
+        "科幻",
+        "驾驶舱"
+      ],
+      "favorite": false,
+      "liked": false,
+      "nsfw": false,
+      "source": "system_demo",
+      "note": "",
+      "created_at": "2026-09-29T05:10:06Z",
+      "updated_at": "2026-09-29T05:10:06Z"
+    },
+    {
+      "id": "char_006",
+      "title_zh": "精灵弓箭手",
+      "title_en": "Elf Archer",
+      "prompt": "一位优雅的精灵弓箭手，金色长发，尖耳朵，身着翠绿轻甲，手持长弓，站在古老森林的树冠上",
+      "prompt_en": "An elegant elf archer with long golden hair, pointed ears, wearing emerald light armor, holding a longbow, standing on the canopy of an ancient forest",
+      "category_id": "other",
+      "tags": [
+        "精灵",
+        "弓箭手",
+        "奇幻",
+        "森林"
+      ],
+      "favorite": false,
+      "liked": false,
+      "nsfw": false,
+      "source": "system_demo",
+      "note": "",
+      "created_at": "2026-09-29T05:10:06Z",
+      "updated_at": "2026-09-29T05:10:06Z"
+    },
+    {
+      "id": "char_007",
+      "title_zh": "和风巫女",
+      "title_en": "Shrine Maiden",
+      "prompt": "一位温柔的和风巫女，黑发用红色丝带束起，身穿红白巫女服，手持御币，站在神社鸟居前，樱花飘落",
+      "prompt_en": "A gentle shrine maiden with black hair tied with red ribbons, wearing traditional red and white miko attire, holding a gohei, standing before a shrine torii with falling cherry blossoms",
+      "category_id": "female",
+      "tags": [
+        "和风",
+        "巫女",
+        "神社",
+        "樱花"
+      ],
+      "favorite": false,
+      "liked": false,
+      "nsfw": false,
+      "source": "system_demo",
+      "note": "",
+      "created_at": "2026-09-29T05:10:06Z",
+      "updated_at": "2026-09-29T05:10:06Z"
+    },
+    {
+      "id": "char_008",
+      "title_zh": "蒸汽朋克发明家",
+      "title_en": "Steampunk Inventor",
+      "prompt": "一位热情的蒸汽朋克发明家，戴着护目镜，棕色卷发，身穿皮革马甲与齿轮装饰，手持机械装置，背景是充满管道与蒸汽的工坊",
+      "prompt_en": "An enthusiastic steampunk inventor wearing goggles, brown curly hair, leather vest with gear decorations, holding a mechanical device, workshop background full of pipes and steam",
+      "category_id": "male",
+      "tags": [
+        "蒸汽朋克",
+        "发明家",
+        "工坊",
+        "齿轮"
+      ],
+      "favorite": false,
+      "liked": false,
+      "nsfw": false,
+      "source": "system_demo",
+      "note": "",
+      "created_at": "2026-09-29T05:10:06Z",
+      "updated_at": "2026-09-29T05:10:06Z"
+    }
+  ]
+}

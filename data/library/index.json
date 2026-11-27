@@ -3,5 +3,24 @@
   "name_zh": "系统词库索引",
   "name_en": "System Library Index",
   "description": "插件自带示例词库列表。用户词库请放在 user_data/library/ 下。",
-  "libraries": []
+  "libraries": [
+    {
+      "id": "demo_characters",
+      "file": "demo_characters.json",
+      "name_zh": "示例角色库",
+      "name_en": "Demo Characters",
+      "description": "系统示例：精简角色向完整提示词",
+      "nsfw": false,
+      "preset_count": 8
+    },
+    {
+      "id": "demo_scenes",
+      "file": "demo_scenes.json",
+      "name_zh": "示例场景库",
+      "name_en": "Demo Scenes",
+      "description": "系统示例：场景与氛围向提示词片段",
+      "nsfw": false,
+      "preset_count": 6
+    }
+  ]
 }

@@ -1,10 +1,17 @@
 """
 词库 / 预设管理域节点。
-后续在此实现：词库列表、预设 CRUD、收藏/喜爱、导入等节点。
 """
 from __future__ import annotations
 
+from .browser import (
+    NODE_CLASS_MAPPINGS as _BROWSER_MAPPINGS,
+    NODE_DISPLAY_NAME_MAPPINGS as _BROWSER_DISPLAY,
+)
+
 NODE_CLASS_MAPPINGS = {}
+NODE_CLASS_MAPPINGS.update(_BROWSER_MAPPINGS)
+
 NODE_DISPLAY_NAME_MAPPINGS = {}
+NODE_DISPLAY_NAME_MAPPINGS.update(_BROWSER_DISPLAY)
 
 __all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS"]

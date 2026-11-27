@@ -20,6 +20,7 @@ DEFAULT_SETTINGS: Dict[str, Any] = {
     "suffix": "",
     "reload_on_change": True,
     "include_nsfw": False,
+    "library_join_mode": "newline",
 }
 
 

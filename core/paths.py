@@ -23,9 +23,12 @@ class Paths:
 
         self.settings_file: Path = self.user_data / "settings.json"
         self.favorites_file: Path = self.user_data / "favorites.json"
+        self.library_favorites_file: Path = self.user_data / "library_favorites.json"
 
         self.dictionary_index: Path = self.dictionary / "index.json"
         self.dictionary_nsfw_index: Path = self.dictionary_nsfw / "index.json"
+        self.library_index: Path = self.library / "index.json"
+        self.library_manifest: Path = self.user_library / "_extract_manifest.json"
 
         self.web: Path = self.root / "web"
 

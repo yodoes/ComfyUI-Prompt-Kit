@@ -13,6 +13,7 @@ try:
     from server import PromptServer
 
     from .dictionary_service import dictionary_service
+    from .library_service import library_service
 
     BASE = "/prompt-kit"
 
@@ -193,6 +194,218 @@ try:
         return _json_ok(entry=entry)
 
 
+    # ------------------------------------------------------------------
+    # 词库 / 预设 API
+    # ------------------------------------------------------------------
+
+    @PromptServer.instance.routes.get(f"{BASE}/library/list")
+    async def pk_lib_list(request: web.Request) -> web.Response:
+        include_nsfw = request.query.get("include_nsfw", "0") in ("1", "true", "True")
+        libs = library_service.list_libraries(include_nsfw=include_nsfw)
+        # 不把绝对 path 暴露给前端也可；保留 id/file/name 即可
+        rows = [
+            {
+                "id": m.get("id"),
+                "name_zh": m.get("name_zh"),
+                "name_en": m.get("name_en"),
+                "description": m.get("description") or "",
+                "preset_count": m.get("preset_count") or 0,
+                "nsfw": bool(m.get("nsfw")),
+                "readonly": bool(m.get("readonly")),
+                "group": m.get("group") or "user",
+                "system": bool(m.get("system")),
+            }
+            for m in libs
+        ]
+        return _json_ok(libraries=rows)
+
+    @PromptServer.instance.routes.get(f"{BASE}/library/get")
+    async def pk_lib_get(request: web.Request) -> web.Response:
+        lid = (request.query.get("id") or "").strip()
+        if not lid:
+            return _json_err("缺少 id")
+        language = request.query.get("lang", "zh")
+        lib = library_service.load_library(lid)
+        if not lib:
+            return _json_err("词库不存在", 404)
+        # 默认不返回全部 presets（可能 5000 条）；仅元数据 + categories
+        return _json_ok(
+            library={
+                "id": lib.get("id"),
+                "name_zh": lib.get("name_zh"),
+                "name_en": lib.get("name_en"),
+                "description": lib.get("description") or "",
+                "categories": lib.get("categories") or [],
+                "preset_count": len(lib.get("presets") or []),
+                "readonly": bool(lib.get("_readonly")),
+                "nsfw": bool(lib.get("_nsfw")),
+            },
+            tags=library_service.collect_tags(lid),
+            categories=library_service.collect_categories(lid),
+        )
+
+    @PromptServer.instance.routes.get(f"{BASE}/library/search")
+    async def pk_lib_search(request: web.Request) -> web.Response:
+        lid = (request.query.get("id") or request.query.get("library_id") or "").strip()
+        if not lid:
+            return _json_err("缺少词库 id")
+        q = (request.query.get("q") or "").strip()
+        category_id = (request.query.get("category_id") or "").strip()
+        tags_raw = (request.query.get("tags") or "").strip()
+        tags = [t.strip() for t in tags_raw.split(",") if t.strip()] if tags_raw else []
+        tag_mode = (request.query.get("tag_mode") or "and").strip().lower()
+        favorites_only = request.query.get("favorites", "0") in ("1", "true", "True")
+        include_nsfw = request.query.get("include_nsfw", "1") in ("1", "true", "True")
+        language = request.query.get("lang", "zh")
+        try:
+            offset = max(0, int(request.query.get("offset") or 0))
+            limit = min(200, max(1, int(request.query.get("limit") or 50)))
+        except ValueError:
+            return _json_err("offset/limit 无效")
+        result = library_service.search_presets(
+            lid,
+            query=q,
+            category_id=category_id,
+            tags=tags,
+            tag_mode=tag_mode,
+            favorites_only=favorites_only,
+            include_nsfw_presets=include_nsfw,
+            language=language,
+            offset=offset,
+            limit=limit,
+        )
+        return _json_ok(**result)
+
+    @PromptServer.instance.routes.get(f"{BASE}/library/favorites")
+    async def pk_lib_fav_list(request: web.Request) -> web.Response:
+        language = request.query.get("lang", "zh")
+        rows = library_service.list_favorites_entries(language=language)
+        return _json_ok(presets=rows, total=len(rows))
+
+    @PromptServer.instance.routes.post(f"{BASE}/library/favorite")
+    async def pk_lib_fav_mutate(request: web.Request) -> web.Response:
+        try:
+            data = await request.json()
+        except Exception as e:
+            return _json_err(f"JSON 无效: {e}")
+        lid = (data.get("library_id") or "").strip()
+        pid = (data.get("preset_id") or data.get("id") or "").strip()
+        if not lid or not pid:
+            return _json_err("缺少 library_id / preset_id")
+        now = library_service.toggle_favorite(lid, pid)
+        return _json_ok(favorited=now, library_id=lid, preset_id=pid)
+
+    @PromptServer.instance.routes.post(f"{BASE}/library/create")
+    async def pk_lib_create(request: web.Request) -> web.Response:
+        try:
+            data = await request.json()
+        except Exception as e:
+            return _json_err(f"JSON 无效: {e}")
+        try:
+            meta = library_service.create_library(
+                data.get("name_zh") or data.get("name") or "",
+                library_id=data.get("id") or "",
+                name_en=data.get("name_en") or "",
+                description=data.get("description") or "",
+            )
+            return _json_ok(library=meta)
+        except Exception as e:
+            return _json_err(str(e))
+
+    @PromptServer.instance.routes.post(f"{BASE}/library/delete")
+    async def pk_lib_delete(request: web.Request) -> web.Response:
+        try:
+            data = await request.json()
+        except Exception as e:
+            return _json_err(f"JSON 无效: {e}")
+        lid = (data.get("id") or data.get("library_id") or "").strip()
+        if not lid:
+            return _json_err("缺少 id")
+        try:
+            library_service.delete_library(lid)
+            return _json_ok(deleted=lid)
+        except Exception as e:
+            return _json_err(str(e))
+
+    @PromptServer.instance.routes.post(f"{BASE}/library/preset")
+    async def pk_lib_preset(request: web.Request) -> web.Response:
+        try:
+            data = await request.json()
+        except Exception as e:
+            return _json_err(f"JSON 无效: {e}")
+        action = (data.get("action") or "add").strip().lower()
+        lid = (data.get("library_id") or "").strip()
+        if not lid:
+            return _json_err("缺少 library_id")
+        try:
+            if action == "add":
+                preset = library_service.add_preset(
+                    lid,
+                    title_zh=data.get("title_zh") or data.get("title") or "",
+                    title_en=data.get("title_en") or "",
+                    prompt=data.get("prompt") or "",
+                    prompt_en=data.get("prompt_en") or "",
+                    category_id=data.get("category_id") or "",
+                    tags=data.get("tags") or [],
+                    nsfw=bool(data.get("nsfw")),
+                    note=data.get("note") or "",
+                )
+                return _json_ok(preset=preset)
+            if action == "update":
+                pid = (data.get("preset_id") or data.get("id") or "").strip()
+                if not pid:
+                    return _json_err("缺少 preset_id")
+                fields = {
+                    k: data[k]
+                    for k in (
+                        "title_zh",
+                        "title_en",
+                        "prompt",
+                        "prompt_en",
+                        "category_id",
+                        "tags",
+                        "nsfw",
+                        "note",
+                    )
+                    if k in data
+                }
+                preset = library_service.update_preset(lid, pid, fields)
+                return _json_ok(preset=preset)
+            if action == "delete":
+                pid = (data.get("preset_id") or data.get("id") or "").strip()
+                if not pid:
+                    return _json_err("缺少 preset_id")
+                library_service.delete_preset(lid, pid)
+                return _json_ok(deleted=pid)
+            return _json_err(f"未知 action: {action}")
+        except Exception as e:
+            return _json_err(str(e))
+
+    @PromptServer.instance.routes.post(f"{BASE}/library/tags")
+    async def pk_lib_tags(request: web.Request) -> web.Response:
+        try:
+            data = await request.json()
+        except Exception as e:
+            return _json_err(f"JSON 无效: {e}")
+        lid = (data.get("library_id") or "").strip()
+        pid = (data.get("preset_id") or "").strip()
+        if not lid or not pid:
+            return _json_err("缺少 library_id / preset_id")
+        action = (data.get("action") or "set").strip().lower()
+        tags = data.get("tags") or []
+        try:
+            new_tags = library_service.set_preset_tags(lid, pid, tags, action=action)
+            return _json_ok(tags=new_tags)
+        except Exception as e:
+            return _json_err(str(e))
+
+    @PromptServer.instance.routes.post(f"{BASE}/library/reload")
+    async def pk_lib_reload(request: web.Request) -> web.Response:
+        library_service.reload()
+        n = len(library_service.list_libraries(include_nsfw=True))
+        return _json_ok(count=n)
+
+
     @PromptServer.instance.routes.post(f"{BASE}/entry/delete")
     async def pk_delete_entry(request: web.Request) -> web.Response:
         try:
@@ -234,7 +447,7 @@ try:
             return _json_err("词条不存在或更新失败", 404)
         return _json_ok(entry=entry)
 
-    print("[Prompt-Kit] API routes registered: /prompt-kit/*")
+    print("[Prompt-Kit] API routes registered: /prompt-kit/* (+ library)")
 
 except ImportError:
     # 非 ComfyUI 环境

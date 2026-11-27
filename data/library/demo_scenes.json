@@ -1,0 +1,173 @@
+{
+  "id": "demo_scenes",
+  "name_zh": "示例场景库",
+  "name_en": "Demo Scenes",
+  "description": "系统示例：场景与氛围向提示词片段，用于演示。",
+  "version": 1,
+  "categories": [
+    {
+      "id": "nature",
+      "name_zh": "自然",
+      "name_en": "Nature",
+      "order": 1
+    },
+    {
+      "id": "urban",
+      "name_zh": "都市",
+      "name_en": "Urban",
+      "order": 2
+    },
+    {
+      "id": "fantasy",
+      "name_zh": "奇幻",
+      "name_en": "Fantasy",
+      "order": 3
+    }
+  ],
+  "presets": [
+    {
+      "id": "scene_001",
+      "title_zh": "樱花神社",
+      "title_en": "Cherry Blossom Shrine",
+      "prompt": "宁静的日本神社，红色鸟居，满开的樱花，阳光透过花瓣洒下斑驳光影，石灯笼与青石小径",
+      "prompt_en": "A tranquil Japanese shrine, red torii gates, fully blooming cherry blossoms, sunlight filtering through petals casting dappled shadows, stone lanterns and a mossy stone path",
+      "category_id": "nature",
+      "tags": [
+        "神社",
+        "樱花",
+        "和风",
+        "宁静"
+      ],
+      "favorite": false,
+      "liked": false,
+      "nsfw": false,
+      "source": "system_demo",
+      "note": "",
+      "created_at": "2026-09-29T05:10:06Z",
+      "updated_at": "2026-09-29T05:10:06Z"
+    },
+    {
+      "id": "scene_002",
+      "title_zh": "雨夜霓虹街",
+      "title_en": "Rainy Neon Street",
+      "prompt": "雨夜的赛博朋克街道，湿润的柏油路反射着霓虹灯牌，行人撑着伞匆匆走过，远处高楼隐入雾中",
+      "prompt_en": "A rainy cyberpunk street at night, wet asphalt reflecting neon signs, pedestrians with umbrellas hurrying by, distant skyscrapers fading into mist",
+      "category_id": "urban",
+      "tags": [
+        "赛博朋克",
+        "雨夜",
+        "霓虹",
+        "街道"
+      ],
+      "favorite": false,
+      "liked": false,
+      "nsfw": false,
+      "source": "system_demo",
+      "note": "",
+      "created_at": "2026-09-29T05:10:06Z",
+      "updated_at": "2026-09-29T05:10:06Z"
+    },
+    {
+      "id": "scene_003",
+      "title_zh": "雪山营地",
+      "title_en": "Snowy Mountain Camp",
+      "prompt": "白雪覆盖的高山营地，帐篷前升起篝火，周围是皑皑雪峰与冷杉林，清晨的阳光刚刚照亮山脊",
+      "prompt_en": "A high mountain camp covered in snow, a campfire burning before tents, surrounded by snow-capped peaks and fir forests, morning sunlight just touching the ridgeline",
+      "category_id": "nature",
+      "tags": [
+        "雪山",
+        "营地",
+        "篝火",
+        "清晨"
+      ],
+      "favorite": false,
+      "liked": false,
+      "nsfw": false,
+      "source": "system_demo",
+      "note": "",
+      "created_at": "2026-09-29T05:10:06Z",
+      "updated_at": "2026-09-29T05:10:06Z"
+    },
+    {
+      "id": "scene_004",
+      "title_zh": "废弃车站",
+      "title_en": "Abandoned Station",
+      "prompt": "被遗忘的废弃火车站，锈蚀的铁轨延伸向远方，月台长满杂草，夕阳透过破损的屋顶洒下金色光柱",
+      "prompt_en": "A forgotten abandoned train station, rusted rails stretching into the distance, the platform overgrown with weeds, golden light beams pouring through the broken roof at sunset",
+      "category_id": "urban",
+      "tags": [
+        "废弃",
+        "车站",
+        "夕阳",
+        "废墟"
+      ],
+      "favorite": false,
+      "liked": false,
+      "nsfw": false,
+      "source": "system_demo",
+      "note": "",
+      "created_at": "2026-09-29T05:10:06Z",
+      "updated_at": "2026-09-29T05:10:06Z"
+    },
+    {
+      "id": "scene_005",
+      "title_zh": "浮空岛屿",
+      "title_en": "Floating Island",
+      "prompt": "漂浮在云海之上的奇幻岛屿，瀑布从边缘倾泻而下，岛上有古老石柱与发光植物，天空中有飞鸟与小型飞艇",
+      "prompt_en": "A fantasy floating island above a sea of clouds, waterfalls cascading from the edges, ancient stone pillars and glowing plants on the island, birds and small airships in the sky",
+      "category_id": "fantasy",
+      "tags": [
+        "浮空岛",
+        "奇幻",
+        "云海",
+        "瀑布"
+      ],
+      "favorite": false,
+      "liked": false,
+      "nsfw": false,
+      "source": "system_demo",
+      "note": "",
+      "created_at": "2026-09-29T05:10:06Z",
+      "updated_at": "2026-09-29T05:10:06Z"
+    },
+    {
+      "id": "scene_006",
+      "title_zh": "图书馆午后",
+      "title_en": "Afternoon Library",
+      "prompt": "安静的古典图书馆，高大书架排满旧书，阳光从落地窗斜照进来，空气中有细微尘埃在光柱中漂浮，一张木桌与一杯热茶",
+      "prompt_en": "A quiet classical library, tall bookshelves filled with old books, sunlight slanting through floor-to-ceiling windows, fine dust floating in the light beams, a wooden table with a cup of hot tea",
+      "category_id": "urban",
+      "tags": [
+        "图书馆",
+        "安静",
+        "午后",
+        "阳光"
+      ],
+      "favorite": false,
+      "liked": false,
+      "nsfw": false,
+      "source": "system_demo",
+      "note": "",
+      "created_at": "2026-09-29T05:10:06Z",
+      "updated_at": "2026-09-29T05:10:06Z"
+    },
+    {
+      "id": "p_b24ffaa399",
+      "title_zh": "回归测试临时",
+      "title_en": "",
+      "prompt": "这是一条回归测试预设正文请忽略",
+      "prompt_en": "",
+      "category_id": "",
+      "tags": [
+        "test"
+      ],
+      "favorite": false,
+      "liked": false,
+      "nsfw": false,
+      "source": "user",
+      "note": "",
+      "created_at": "2026-10-04T04:27:08",
+      "updated_at": "2026-10-04T04:27:08"
+    }
+  ]
+}
